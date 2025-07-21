@@ -155,3 +155,46 @@ li:hover {
 #add-category-btn:hover {
   background-color: #1e7e34;
 }
+
+
+/* 全体のフォントとサイズ調整 */
+body {
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+/* スマホ用: ボタンのサイズと配置を調整 */
+.category-btn {
+  display: block;
+  width: 80%;
+  max-width: 300px;
+  margin: 15px auto;
+  padding: 18px;
+  font-size: 20px;
+  text-align: center;
+}
+
+/* 見出しも大きく */
+h1 {
+  font-size: 24px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* スマホ画面幅に合わせる（768px以下） */
+@media (max-width: 768px) {
+  body {
+    font-size: 20px;
+  }
+
+  .category-btn {
+    font-size: 22px;
+    padding: 20px;
+  }
+
+  #add-category-btn {
+    width: 70px;
+    height: 70px;
+    font-size: 36px;
+  }
+}

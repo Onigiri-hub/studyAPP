@@ -1,4 +1,4 @@
-/* 全体のベースフォントを少し大きめに */
+/* 基本設定 */
 body {
   font-family: sans-serif;
   font-size: 18px;
@@ -6,6 +6,7 @@ body {
   margin: 0;
   padding: 0;
   background: #f8f8f8;
+  color: #333;
 }
 
 /* 見出し */
@@ -15,7 +16,7 @@ h1 {
   margin: 20px 0;
 }
 
-/* カテゴリボタン */
+/* ホーム画面のカテゴリボタン */
 .category-btn {
   display: block;
   width: 80%;
@@ -38,7 +39,7 @@ h1 {
   transform: scale(1.03);
 }
 
-/* プラスボタン */
+/* 科目追加ボタン（ホーム画面右下の丸） */
 #add-category-btn {
   display: block;
   margin: 30px auto;
@@ -58,18 +59,124 @@ h1 {
   background-color: #1e7e34;
 }
 
-/* スマホ用: 幅768px以下 */
+/* 戻るボタン */
+.nav-btn {
+  display: block;
+  margin: 10px;
+  padding: 10px 20px;
+  font-size: 18px;
+}
+
+/* リスト画面の項目 */
+#item-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px auto;
+  max-width: 400px;
+}
+
+#item-list li {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background: white;
+  margin: 10px 0;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  font-size: 18px;
+}
+
+/* スタンプ丸 */
+.stamp {
+  width: 30px;
+  height: 30px;
+  border: 2px solid #007BFF;
+  border-radius: 50%;
+  margin-right: 15px;
+  background: white;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.stamp.stamped {
+  background: #007BFF;
+}
+
+/* スタンプ光るアニメーション */
+.glow-anim {
+  box-shadow: 0 0 10px 4px #00ffea;
+}
+
+/* 項目追加ボタン */
+.add-item-btn {
+  display: block;
+  margin: 20px auto;
+  padding: 15px 30px;
+  background-color: #ffc107;
+  color: #333;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: background-color 0.2s;
+}
+
+.add-item-btn:hover {
+  background-color: #e0a800;
+}
+
+/* エクスポート/インポートボタン */
+.export-import {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.export-import button {
+  margin: 0 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #6c757d;
+  color: white;
+}
+
+.export-import button:hover {
+  background-color: #5a6268;
+}
+
+/* スマホ用調整 */
 @media (max-width: 768px) {
   body {
     font-size: 20px;
   }
+
+  h1 {
+    font-size: 26px;
+  }
+
   .category-btn {
     font-size: 22px;
     padding: 20px;
   }
+
   #add-category-btn {
     width: 80px;
     height: 80px;
     font-size: 40px;
+  }
+
+  #item-list li {
+    font-size: 20px;
+    padding: 20px;
+  }
+
+  .stamp {
+    width: 35px;
+    height: 35px;
   }
 }

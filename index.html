@@ -1,53 +1,30 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#007BFF">
-<script>
-  // Service Worker 登録
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js").then(() => {
-      console.log("Service Worker registered!");
-    });
-  }
-</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>スタンプカード デモ</title>
+  <title>スタンプカード</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- 画面1: ホーム -->
-
-  <!-- 画面1: ホーム -->
-<div id="home-screen">
-    <h1>科目を選択</h1>
-    <div id="category-list" class="category-buttons"></div>
-    <button id="add-category-btn">＋</button>
-</div>
-
-
-<!--
+  <!-- ホーム画面 -->
   <div id="home-screen">
-    <h1>科目を選択</h1>
-    <div class="category-buttons">
-      <button class="category-btn" data-category="math1">数学1</button>
-      <button class="category-btn" data-category="grammar">英文法</button>
+    <h1>科目一覧</h1>
+    <div id="category-list"></div>
+    <button id="add-category-btn">＋</button>
+    <div class="export-import">
+      <button id="export-btn">データ書き出し</button>
+      <button id="import-btn">データ読み込み</button>
     </div>
   </div>
--->
 
-  <!-- 画面2: リスト画面 -->
+  <!-- リスト画面 -->
   <div id="list-screen" style="display:none;">
-    <h1 id="category-title">科目</h1>
-    <div>
-      <button id="export-btn">データをエクスポート</button>
-      <button id="import-btn">データをインポート</button>
-      <button id="back-btn">← 戻る</button>
-    </div>
+    <button id="back-btn" class="nav-btn">← 戻る</button>
+    <h1 id="category-title"></h1>
     <ul id="item-list"></ul>
-    <button id="add-btn">＋</button>
+    <button id="add-btn" class="add-item-btn">＋ 項目追加</button>
   </div>
 
   <script src="script.js"></script>

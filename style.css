@@ -180,3 +180,62 @@ h1 {
     height: 35px;
   }
 }
+
+/* アクションメニュー全体 */
+#action-menu {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+  z-index: 999;
+}
+
+/* メニューを隠すとき */
+#action-menu.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* メニューの本体 */
+.menu-content {
+  background: white;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+  text-align: center;
+  padding: 10px 0;
+  animation: slideUp 0.3s ease;
+}
+
+/* メニュー内のボタン */
+.menu-content button {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  font-size: 18px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-top: 1px solid #ddd;
+}
+
+.menu-content button:hover {
+  background: #f0f0f0;
+}
+
+/* スライドアニメーション */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

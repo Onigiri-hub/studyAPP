@@ -3,40 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>スタンプカード</title>
-  <link rel="stylesheet" href="./style.css?v=2">
+  <title>学習スタンプアプリ</title>
+  <link rel="stylesheet" href="./style.css?v=3">
 </head>
-
-<!-- アクションメニュー（削除／名前変更） -->
-<div id="action-menu" class="hidden">
-  <div class="menu-content">
-    <button id="rename-btn">名前を変更</button>
-    <button id="delete-btn">削除</button>
-    <button id="cancel-btn">キャンセル</button>
-  </div>
-</div>
-
 <body>
-
-  <!-- ホーム画面 -->
-  <div id="home-screen">
+  <!-- 画面1（科目一覧） -->
+  <div id="screen1">
     <h1>科目一覧</h1>
     <div id="category-list"></div>
-    <button id="add-category-btn">＋</button>
-    <div class="export-import">
-      <button id="export-btn">データ書き出し</button>
-      <button id="import-btn">データ読み込み</button>
+    <button id="add-category" class="fab">＋</button>
+  </div>
+
+  <!-- 画面2（項目リスト） -->
+  <div id="screen2" class="hidden">
+    <h1 id="category-title"></h1>
+    <ul id="item-list"></ul>
+    <button id="add-item" class="fab">＋</button>
+    <button id="back-btn">戻る</button>
+  </div>
+
+  <!-- アクションメニュー（名前変更・削除） -->
+  <div id="action-menu" class="hidden">
+    <div class="menu-content">
+      <button id="rename-btn">名前を変更</button>
+      <button id="delete-btn">削除</button>
+      <button id="cancel-btn">キャンセル</button>
     </div>
   </div>
 
-  <!-- リスト画面 -->
-  <div id="list-screen" style="display:none;">
-    <button id="back-btn" class="nav-btn">← 戻る</button>
-    <h1 id="category-title"></h1>
-    <ul id="item-list"></ul>
-    <button id="add-btn" class="add-item-btn">＋ 項目追加</button>
-  </div>
-
+  <!-- スクリプトは最後に読み込む -->
   <script src="./script.js?v=3"></script>
 </body>
 </html>

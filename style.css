@@ -1,241 +1,152 @@
-/* 基本設定 */
+/* 全体の基本スタイル */
 body {
-  font-family: sans-serif;
-  font-size: 18px;
-  line-height: 1.5;
   margin: 0;
-  padding: 0;
-  background: #f8f8f8;
+  font-family: sans-serif;
+  background: #f4f4f4;
   color: #333;
+  text-align: center;
 }
 
 /* 見出し */
 h1 {
-  font-size: 24px;
-  text-align: center;
+  font-size: 1.5rem;
   margin: 20px 0;
 }
 
-/* ホーム画面のカテゴリボタン */
+/* 科目ボタン（画面1） */
 .category-btn {
   display: block;
   width: 80%;
-  max-width: 320px;
-  margin: 15px auto;
-  padding: 18px;
-  font-size: 20px;
-  text-align: center;
+  max-width: 300px;
+  margin: 10px auto;
+  padding: 15px;
   background-color: white;
-  border: 2px solid #007BFF;
+  border: 2px solid #007bff;
   border-radius: 10px;
+  font-size: 1.2rem;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-  transition: background-color 0.2s, transform 0.1s;
+  transition: all 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-
 .category-btn:hover {
-  background-color: #007BFF;
+  background-color: #007bff;
   color: white;
-  transform: scale(1.03);
 }
 
-/* 科目追加ボタン（ホーム画面右下の丸） */
-#add-category-btn {
-  display: block;
-  margin: 30px auto;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background-color: #28a745;
-  color: white;
-  font-size: 36px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  transition: background-color 0.2s;
-}
-
-#add-category-btn:hover {
-  background-color: #1e7e34;
-}
-
-/* 戻るボタン */
-.nav-btn {
-  display: block;
-  margin: 10px;
-  padding: 10px 20px;
-  font-size: 18px;
-}
-
-/* リスト画面の項目 */
+/* 項目リスト（画面2） */
 #item-list {
   list-style: none;
   padding: 0;
-  margin: 20px auto;
+  margin: 0;
   max-width: 400px;
+  margin: auto;
 }
-
 #item-list li {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   background: white;
-  margin: 10px 0;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  font-size: 18px;
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: grab;
+}
+#item-list li.dragging {
+  opacity: 0.5;
 }
 
-/* スタンプ丸 */
+/* スタンプ */
 .stamp {
   width: 30px;
   height: 30px;
-  border: 2px solid #007BFF;
   border-radius: 50%;
-  margin-right: 15px;
-  background: white;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
+  margin-right: 10px;
+  background-color: #ccc;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
-
 .stamp.stamped {
-  background: #007BFF;
+  background-color: gold;
 }
 
 /* スタンプ光るアニメーション */
 .glow-anim {
-  box-shadow: 0 0 10px 4px #00ffea;
+  animation: glow 0.5s ease;
+}
+@keyframes glow {
+  0% { box-shadow: 0 0 0px gold; }
+  50% { box-shadow: 0 0 20px gold; }
+  100% { box-shadow: 0 0 0px gold; }
 }
 
-/* 項目追加ボタン */
-.add-item-btn {
-  display: block;
-  margin: 20px auto;
-  padding: 15px 30px;
-  background-color: #ffc107;
-  color: #333;
-  font-size: 18px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  transition: background-color 0.2s;
+/* 画面の表示切り替え */
+.hidden {
+  display: none;
 }
 
-.add-item-btn:hover {
-  background-color: #e0a800;
-}
-
-/* エクスポート/インポートボタン */
-.export-import {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.export-import button {
-  margin: 0 10px;
-  padding: 10px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background-color: #6c757d;
+/* フローティングアクションボタン（＋） */
+.fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #4CAF50;
   color: white;
+  font-size: 36px;
+  text-align: center;
+  line-height: 60px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  border: none;
+  z-index: 100;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.4);
 }
 
-.export-import button:hover {
-  background-color: #5a6268;
-}
-
-/* スマホ用調整 */
-@media (max-width: 768px) {
-  body {
-    font-size: 20px;
-  }
-
-  h1 {
-    font-size: 26px;
-  }
-
-  .category-btn {
-    font-size: 22px;
-    padding: 20px;
-  }
-
-  #add-category-btn {
-    width: 80px;
-    height: 80px;
-    font-size: 40px;
-  }
-
-  #item-list li {
-    font-size: 20px;
-    padding: 20px;
-  }
-
-  .stamp {
-    width: 35px;
-    height: 35px;
-  }
-}
-
-/* アクションメニュー全体 */
+/* アクションメニュー（下から出てくるUI） */
 #action-menu {
   position: fixed;
-  left: 0;
-  right: 0;
   bottom: 0;
-  top: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  transition: opacity 0.3s ease;
-  z-index: 999;
-}
-
-/* メニューを隠すとき */
-#action-menu.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* メニューの本体 */
-.menu-content {
+  left: 0;
+  width: 100%;
   background: white;
-  width: 100%;
-  max-width: 400px;
-  border-radius: 12px 12px 0 0;
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
-  text-align: center;
-  padding: 10px 0;
-  animation: slideUp 0.3s ease;
-}
-
-/* メニュー内のボタン */
-.menu-content button {
-  display: block;
-  width: 100%;
-  padding: 15px;
-  font-size: 18px;
-  border: none;
-  background: none;
-  cursor: pointer;
   border-top: 1px solid #ddd;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 200;
+  padding: 10px 0;
+  animation: slide-up 0.3s ease;
+}
+#action-menu.hidden {
+  display: none;
+}
+#action-menu .menu-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#action-menu button {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  transition: background-color 0.2s;
+}
+#action-menu button:hover {
+  background-color: #0056b3;
 }
 
-.menu-content button:hover {
-  background: #f0f0f0;
-}
-
-/* スライドアニメーション */
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
+/* モーダルのスライドアニメーション */
+@keyframes slide-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }

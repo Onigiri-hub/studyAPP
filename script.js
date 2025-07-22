@@ -18,7 +18,13 @@ function renderCategories() {
   categories.forEach(cat => {
     const btn = document.createElement("button");
     btn.classList.add("category-btn");
-    btn.textContent = cat;
+
+    // 進捗計算
+    const total = items.filter(i => i.category === cat).length;
+    const done = items.filter(i => i.category === cat && i.stamped).length;
+    const progress = total > 0 ? `${done}/${total}` : "0/0";
+
+    btn.textContent = `${cat} (${progress})`;
     btn.dataset.category = cat;
 
     // カテゴリを開く
@@ -40,6 +46,7 @@ function renderCategories() {
     container.appendChild(btn);
   });
 }
+
 
 // 項目リスト描画
 function renderItems() {

@@ -85,10 +85,12 @@ function renderItems() {
 
     // スマホ: 長押し削除
     let pressTimer;
-    li.addEventListener("touchstart", () => {
-      pressTimer = setTimeout(triggerDelete, 800);
+    li.addEventListener("touchstart", (e) => {
+      e.preventDefault();  // デフォルトの選択・メニューを抑制
+      pressTimer = setTimeout(triggerDelete, 700); // 少し短くする
     });
     li.addEventListener("touchend", () => clearTimeout(pressTimer));
+
 
     li.appendChild(stamp);
     li.appendChild(text);

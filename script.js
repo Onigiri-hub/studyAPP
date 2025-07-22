@@ -55,9 +55,9 @@ function renderItems() {
     stamp.classList.add("stamp");
     if (item.stamped) stamp.classList.add("stamped");
 
-    // スタンプ押しでON/OFF
+    // スタンプON/OFF（クリックのみ）
     stamp.addEventListener("click", (e) => {
-      e.stopPropagation();
+      e.stopPropagation(); // 削除処理とは独立
       items[index].stamped = !items[index].stamped;
       saveItems();
       stamp.classList.add("glow-anim");
@@ -68,16 +68,25 @@ function renderItems() {
     const text = document.createElement("span");
     text.textContent = item.name;
 
-    // 右クリック削除
+    // 削除処理
+    const triggerDelete = () => {
+      if (confirm(`「${items[index].name}」を削除しますか？`)) {
+        items.splice(index, 1);
+        saveItems();
+        renderItems();
+      }
+    };
+
+    // PC: 右クリック削除
     li.addEventListener("contextmenu", (e) => {
       e.preventDefault();
-      deleteItem(index);
+      triggerDelete();
     });
 
-    // スマホ長押し削除
+    // スマホ: 長押し削除
     let pressTimer;
     li.addEventListener("touchstart", () => {
-      pressTimer = setTimeout(() => deleteItem(index), 800);
+      pressTimer = setTimeout(triggerDelete, 800);
     });
     li.addEventListener("touchend", () => clearTimeout(pressTimer));
 
@@ -86,6 +95,7 @@ function renderItems() {
     list.appendChild(li);
   });
 }
+
 
 // 項目追加
 function addItem(name) {

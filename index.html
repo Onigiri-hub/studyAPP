@@ -3,57 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#4CAF50">
-  <title>StampCard App</title>
-  <link rel="stylesheet" href="style.css">
+  <title>My Study App</title>
+
+  <!-- PWA対応 -->
   <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2196F3">
+
+  <!-- iOS PWA対応 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
-  <!-- 画面1: 科目リスト -->
+  <!-- 画面1: 科目一覧 -->
   <div id="screen1">
-    <h1>科目リスト</h1>
+    <h1>科目一覧</h1>
     <div id="category-list"></div>
-    <button id="add-category" class="floating-btn">＋</button>
 
-    <!-- データのエクスポート/インポート -->
+    <!-- エクスポート / インポート -->
     <div class="export-import">
       <button id="export-btn">エクスポート</button>
       <button id="import-btn">インポート</button>
-      <input type="file" id="import-file" accept="application/json" style="display:none">
+      <input type="file" id="import-file" style="display:none">
     </div>
+
+    <!-- 科目追加ボタン -->
+    <button id="add-category" class="floating-btn">＋</button>
   </div>
 
-  <!-- 画面2: 項目リスト -->
+  <!-- 画面2: 選択した科目の項目リスト -->
   <div id="screen2" class="hidden">
     <button id="back-btn">← 戻る</button>
-    <h2 id="category-title"></h2>
+    <h2 id="subject-title"></h2>
     <ul id="item-list"></ul>
+
+    <!-- 項目追加ボタン -->
     <button id="add-item" class="floating-btn">＋</button>
   </div>
 
-  <!-- 科目アクションメニュー -->
+  <!-- 科目用メニュー（削除・名前変更） -->
   <div id="action-menu" class="hidden">
-    <button id="rename-btn">名前を変更</button>
-    <button id="delete-btn">削除</button>
-    <button id="cancel-btn">キャンセル</button>
+    <button id="rename-category">名前を変更</button>
+    <button id="delete-category">削除</button>
+    <button id="cancel-action">キャンセル</button>
   </div>
 
-  <!-- 項目アクションメニュー -->
+  <!-- 項目用メニュー（上へ・下へ・削除） -->
   <div id="item-action-menu" class="hidden">
-    <button id="move-up-btn">上へ</button>
-    <button id="move-down-btn">下へ</button>
-    <button id="delete-item-btn">削除</button>
-    <button id="cancel-item-btn">キャンセル</button>
+    <button id="move-up">上へ</button>
+    <button id="move-down">下へ</button>
+    <button id="delete-item">削除</button>
+    <button id="cancel-item-action">キャンセル</button>
   </div>
 
-  <script src="script.js"></script>
-  <script>
-    // --- Service Worker 登録 ---
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js").then(() => {
-        console.log("Service Worker registered");
-      });
-    }
-  </script>
+  <!-- スクリプト -->
+  <script src="script.js?v=6"></script>
 </body>
 </html>

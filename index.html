@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>スタンプカード デモ</title>
-  <link rel="stylesheet" href="./style.css?v=5">
+  <link rel="stylesheet" href="./style.css?v=6">
 </head>
 <body>
   <!-- 画面1 -->
@@ -12,6 +12,13 @@
     <h2>科目一覧</h2>
     <div id="category-list"></div>
     <button id="add-category" class="add-btn">＋</button>
+
+    <!-- データ管理ボタン -->
+    <div id="data-controls">
+      <button id="export-btn">データをエクスポート</button>
+      <button id="import-btn">データをインポート</button>
+      <input type="file" id="import-file" accept="application/json" style="display:none;">
+    </div>
   </div>
 
   <!-- 画面2 -->
@@ -37,6 +44,6 @@
     <button id="cancel-item-btn">キャンセル</button>
   </div>
 
-  <script src="./script.js?v=5"></script>
+  <script src="./script.js?v=6"></script>
 </body>
 </html>

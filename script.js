@@ -7,7 +7,48 @@ function saveData() {
   localStorage.setItem("items", JSON.stringify(items));
 }
 
-// 科目リスト表示
+// --- エクスポート機能 ---
+document.getElementById("export-btn").addEventListener("click", () => {
+  const data = { categories, items };
+  const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "stampcard-data.json";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+// --- インポート機能 ---
+document.getElementById("import-btn").addEventListener("click", () => {
+  document.getElementById("import-file").click();
+});
+
+document.getElementById("import-file").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (data.categories && data.items) {
+        categories = data.categories;
+        items = data.items;
+        saveData();
+        renderCategories();
+        alert("データをインポートしました！");
+      } else {
+        alert("不正なデータです");
+      }
+    } catch {
+      alert("JSONの読み込みに失敗しました");
+    }
+  };
+  reader.readAsText(file);
+});
+
+// --- 以下は前回と同じ機能 ---
+
 function renderCategories() {
   const list = document.getElementById("category-list");
   list.innerHTML = "";
@@ -29,7 +70,6 @@ function renderCategories() {
       renderItems();
     });
 
-    // 長押し・右クリックでメニュー
     let pressTimer;
     btn.addEventListener("contextmenu", e => {
       e.preventDefault();
@@ -46,7 +86,6 @@ function renderCategories() {
   });
 }
 
-// 科目メニュー
 function showCategoryMenu(index) {
   const menu = document.getElementById("action-menu");
   menu.classList.remove("hidden");
@@ -77,7 +116,6 @@ function showCategoryMenu(index) {
   };
 }
 
-// 項目リスト表示
 function renderItems() {
   const list = document.getElementById("item-list");
   list.innerHTML = "";
@@ -122,7 +160,6 @@ function renderItems() {
   });
 }
 
-// 項目メニュー
 function showItemMenu(index) {
   const menu = document.getElementById("item-action-menu");
   menu.classList.remove("hidden");
@@ -162,7 +199,6 @@ function showItemMenu(index) {
   };
 }
 
-// 科目・項目追加イベントは初期化時に一度だけ登録
 document.getElementById("add-category").addEventListener("click", () => {
   const name = prompt("新しい科目名を入力してください");
   if (!name) return;
@@ -183,12 +219,10 @@ document.getElementById("add-item").addEventListener("click", () => {
   renderCategories();
 });
 
-// 戻るボタン
 document.getElementById("back-btn").addEventListener("click", () => {
   document.getElementById("screen2").classList.add("hidden");
   document.getElementById("screen1").classList.remove("hidden");
   currentCategory = null;
 });
 
-// 初期描画
 renderCategories();

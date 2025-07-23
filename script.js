@@ -1,254 +1,254 @@
-let categories = JSON.parse(localStorage.getItem("categories")) || [];
-let items = JSON.parse(localStorage.getItem("items")) || {};
-let currentCategory = null;
+// ローカルストレージキー
+const STORAGE_KEY = 'study-app-data-v1';
 
+// アプリデータ
+let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+  categories: []
+};
+
+let currentCategory = null;
+let currentItem = null;
+
+// データ保存
 function saveData() {
-  localStorage.setItem("categories", JSON.stringify(categories));
-  localStorage.setItem("items", JSON.stringify(items));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-// --- データのエクスポート ---
-document.getElementById("export-btn").addEventListener("click", () => {
-  const data = { categories, items };
-  const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "stampcard-data.json";
-  a.click();
-  URL.revokeObjectURL(url);
-});
-
-// --- データのインポート（修正版） ---
-document.getElementById("import-btn").addEventListener("click", () => {
-  document.getElementById("import-file").click();
-});
-
-document.getElementById("import-file").addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const data = JSON.parse(reader.result);
-      if (data.categories && data.items) {
-        categories = data.categories;
-
-        // itemsを安全に復元（空や不正データ対策）
-        items = {};
-        for (const [key, arr] of Object.entries(data.items)) {
-          if (Array.isArray(arr)) {
-            items[key] = arr.map(i => ({
-              name: i.name || "",
-              stamped: !!i.stamped
-            }));
-          } else {
-            items[key] = [];
-          }
-        }
-
-        saveData();
-        renderCategories();
-        alert("データをインポートしました！");
-      } else {
-        alert("不正なデータです");
-      }
-    } catch {
-      alert("JSONの読み込みに失敗しました");
-    }
-  };
-  reader.readAsText(file);
-});
-
-// --- 科目リストを描画 ---
+// 科目一覧を描画
 function renderCategories() {
-  const list = document.getElementById("category-list");
-  list.innerHTML = "";
+  const list = document.getElementById('category-list');
+  list.innerHTML = '';
 
-  categories.forEach((cat, index) => {
-    const btn = document.createElement("button");
-    btn.className = "category-btn";
+  data.categories.forEach(category => {
+    // 進捗を計算
+    const total = category.items.length;
+    const done = category.items.filter(item => item.done).length;
+    const progress = `${done}/${total}`;
 
-    const total = items[cat.id]?.length || 0;
-    const stamped = items[cat.id]?.filter(i => i.stamped).length || 0;
+    const btn = document.createElement('button');
+    btn.className = 'category-btn';
+    btn.textContent = `${category.name} (${progress})`;
 
-    btn.textContent = `${cat.name} (${stamped}/${total})`;
+    // クリックで画面2へ遷移
+    btn.addEventListener('click', () => {
+      currentCategory = category;
+      // 画面切り替え
+      document.getElementById('screen1').classList.add('hidden');
+      document.getElementById('screen2').classList.remove('hidden');
 
-    btn.addEventListener("click", () => {
-      currentCategory = cat.id;
-      document.getElementById("category-title").textContent = cat.name;
-      document.getElementById("screen1").classList.add("hidden");
-      document.getElementById("screen2").classList.remove("hidden");
+      // subject-title を安全に更新
+      const titleEl = document.getElementById('subject-title');
+      if (titleEl) {
+        titleEl.textContent = currentCategory.name;
+      }
+
       renderItems();
     });
 
-    // 長押し/右クリックでメニュー表示
-    let pressTimer;
-    btn.addEventListener("contextmenu", e => {
+    // 長押し・右クリックでアクションメニュー
+    btn.addEventListener('contextmenu', e => {
       e.preventDefault();
-      showCategoryMenu(index);
+      showCategoryActionMenu(category);
     });
-    btn.addEventListener("touchstart", () => {
-      pressTimer = setTimeout(() => {
-        showCategoryMenu(index);
+
+    btn.addEventListener('touchstart', e => {
+      e.preventDefault();
+      longPressTimeout = setTimeout(() => {
+        showCategoryActionMenu(category);
       }, 600);
     });
-    btn.addEventListener("touchend", () => clearTimeout(pressTimer));
+
+    btn.addEventListener('touchend', e => {
+      clearTimeout(longPressTimeout);
+    });
 
     list.appendChild(btn);
   });
 }
 
-// --- 科目メニュー ---
-function showCategoryMenu(index) {
-  const menu = document.getElementById("action-menu");
-  menu.classList.remove("hidden");
-
-  document.getElementById("rename-btn").onclick = () => {
-    const newName = prompt("新しい名前を入力してください", categories[index].name);
-    if (newName) {
-      categories[index].name = newName;
-      saveData();
-      renderCategories();
-    }
-    menu.classList.add("hidden");
-  };
-
-  document.getElementById("delete-btn").onclick = () => {
-    const targetId = categories[index].id;
-    if (confirm("本当に削除しますか？")) {
-      categories.splice(index, 1);
-      delete items[targetId];
-      saveData();
-      renderCategories();
-    }
-    menu.classList.add("hidden");
-  };
-
-  document.getElementById("cancel-btn").onclick = () => {
-    menu.classList.add("hidden");
-  };
-}
-
-// --- 項目リストを描画 ---
+// 項目リストを描画
 function renderItems() {
-  const list = document.getElementById("item-list");
-  list.innerHTML = "";
+  const list = document.getElementById('item-list');
+  list.innerHTML = '';
 
-  if (!items[currentCategory]) items[currentCategory] = [];
+  if (!currentCategory) return;
 
-  items[currentCategory].forEach((item, index) => {
-    const li = document.createElement("li");
+  currentCategory.items.forEach((item, index) => {
+    const li = document.createElement('li');
 
-    const stamp = document.createElement("img");
-    stamp.src = item.stamped ? "icons/img02.svg" : "icons/img01.svg";
-    stamp.className = "stamp-img";
+    // スタンプアイコン
+    const img = document.createElement('img');
+    img.src = item.done ? 'icons/img02.svg' : 'icons/img01.svg';
+    img.className = 'stamp-img';
 
-    const toggle = (e) => {
-      e.preventDefault();
-      item.stamped = !item.stamped;
-      stamp.src = item.stamped ? "icons/img02.svg" : "icons/img01.svg";
+    // スタンプ切り替え（クリック/タップ）
+    const toggleStamp = () => {
+      item.done = !item.done;
+      img.src = item.done ? 'icons/img02.svg' : 'icons/img01.svg';
 
-      // --- スタンプのON/OFFで音を再生 ---
-      const soundFile = item.stamped ? "sounds/001.mp3" : "sounds/002.mp3";
-      const sound = new Audio(soundFile);
-      sound.currentTime = 0;
+      // 音を鳴らす
+      const sound = new Audio(item.done ? 'sounds/001.mp3' : 'sounds/002.mp3');
       sound.play();
 
       saveData();
       renderCategories();
     };
 
-    if ("ontouchend" in window) {
-      stamp.addEventListener("touchend", toggle, { passive: false });
-    } else {
-      stamp.addEventListener("click", toggle);
-    }
-
-    const span = document.createElement("span");
-    span.textContent = item.name;
-
-    const menuBtn = document.createElement("button");
-    menuBtn.textContent = "⋯";
-    menuBtn.className = "menu-btn";
-    menuBtn.addEventListener("click", () => {
-      showItemMenu(index);
+    img.addEventListener('click', toggleStamp);
+    img.addEventListener('touchstart', e => {
+      e.preventDefault();
+      toggleStamp();
     });
 
-    li.appendChild(stamp);
+    const span = document.createElement('span');
+    span.textContent = item.text;
+
+    // ⋯メニューボタン
+    const menuBtn = document.createElement('button');
+    menuBtn.className = 'menu-btn';
+    menuBtn.textContent = '⋯';
+    menuBtn.addEventListener('click', () => {
+      currentItem = { item, index };
+      showItemActionMenu();
+    });
+
+    li.appendChild(img);
     li.appendChild(span);
     li.appendChild(menuBtn);
     list.appendChild(li);
   });
+
+  renderCategories(); // 進捗を更新
 }
 
-// --- 項目メニュー ---
-function showItemMenu(index) {
-  const menu = document.getElementById("item-action-menu");
-  menu.classList.remove("hidden");
+// 科目追加
+document.getElementById('add-category').addEventListener('click', () => {
+  const name = prompt('科目名を入力してください:');
+  if (!name) return;
 
-  const arr = items[currentCategory];
+  data.categories.push({ name, items: [] });
+  saveData();
+  renderCategories();
+});
 
-  document.getElementById("move-up-btn").onclick = () => {
+// 項目追加
+document.getElementById('add-item').addEventListener('click', () => {
+  const text = prompt('項目名を入力してください:');
+  if (!text || !currentCategory) return;
+
+  currentCategory.items.push({ text, done: false });
+  saveData();
+  renderItems();
+});
+
+// 戻るボタン
+document.getElementById('back-btn').addEventListener('click', () => {
+  currentCategory = null;
+  document.getElementById('screen2').classList.add('hidden');
+  document.getElementById('screen1').classList.remove('hidden');
+  renderCategories();
+});
+
+// 科目メニュー表示
+function showCategoryActionMenu(category) {
+  const menu = document.getElementById('action-menu');
+  menu.classList.remove('hidden');
+
+  document.getElementById('rename-category').onclick = () => {
+    const newName = prompt('新しい科目名を入力:');
+    if (newName) {
+      category.name = newName;
+      saveData();
+      renderCategories();
+    }
+    menu.classList.add('hidden');
+  };
+
+  document.getElementById('delete-category').onclick = () => {
+    if (confirm('削除しますか？')) {
+      data.categories = data.categories.filter(c => c !== category);
+      saveData();
+      renderCategories();
+    }
+    menu.classList.add('hidden');
+  };
+
+  document.getElementById('cancel-action').onclick = () => {
+    menu.classList.add('hidden');
+  };
+}
+
+// 項目メニュー表示（上へ・下へ・削除）
+function showItemActionMenu() {
+  const menu = document.getElementById('item-action-menu');
+  menu.classList.remove('hidden');
+
+  const { item, index } = currentItem;
+
+  document.getElementById('move-up').onclick = () => {
     if (index > 0) {
+      const arr = currentCategory.items;
       [arr[index - 1], arr[index]] = [arr[index], arr[index - 1]];
       saveData();
       renderItems();
     }
-    menu.classList.add("hidden");
+    menu.classList.add('hidden');
   };
 
-  document.getElementById("move-down-btn").onclick = () => {
+  document.getElementById('move-down').onclick = () => {
+    const arr = currentCategory.items;
     if (index < arr.length - 1) {
       [arr[index + 1], arr[index]] = [arr[index], arr[index + 1]];
       saveData();
       renderItems();
     }
-    menu.classList.add("hidden");
+    menu.classList.add('hidden');
   };
 
-  document.getElementById("delete-item-btn").onclick = () => {
-    if (confirm("削除しますか？")) {
-      arr.splice(index, 1);
-      saveData();
-      renderItems();
-      renderCategories();
-    }
-    menu.classList.add("hidden");
+  document.getElementById('delete-item').onclick = () => {
+    currentCategory.items.splice(index, 1);
+    saveData();
+    renderItems();
+    menu.classList.add('hidden');
   };
 
-  document.getElementById("cancel-item-btn").onclick = () => {
-    menu.classList.add("hidden");
+  document.getElementById('cancel-item-action').onclick = () => {
+    menu.classList.add('hidden');
   };
 }
 
-// --- 科目・項目追加 ---
-document.getElementById("add-category").addEventListener("click", () => {
-  const name = prompt("新しい科目名を入力してください");
-  if (!name) return;
-  const id = Date.now().toString();
-  categories.push({ id, name });
-  items[id] = [];
-  saveData();
-  renderCategories();
+// エクスポート
+document.getElementById('export-btn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'data.json';
+  a.click();
+  URL.revokeObjectURL(url);
 });
 
-document.getElementById("add-item").addEventListener("click", () => {
-  const name = prompt("新しい項目名を入力してください");
-  if (!name) return;
-  if (!items[currentCategory]) items[currentCategory] = [];
-  items[currentCategory].push({ name, stamped: false });
-  saveData();
-  renderItems();
-  renderCategories();
+// インポート
+document.getElementById('import-btn').addEventListener('click', () => {
+  document.getElementById('import-file').click();
 });
 
-// --- 戻るボタン ---
-document.getElementById("back-btn").addEventListener("click", () => {
-  document.getElementById("screen2").classList.add("hidden");
-  document.getElementById("screen1").classList.remove("hidden");
-  currentCategory = null;
+document.getElementById('import-file').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      data = JSON.parse(reader.result);
+      saveData();
+      renderCategories();
+      alert('インポートしました');
+    } catch {
+      alert('インポート失敗');
+    }
+  };
+  reader.readAsText(file);
 });
 
-// 初期描画
+// 初期表示
 renderCategories();

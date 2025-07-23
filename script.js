@@ -133,10 +133,18 @@ function renderItems() {
       e.preventDefault();
       item.stamped = !item.stamped;
       stamp.src = item.stamped ? "icons/img02.svg" : "icons/img01.svg";
+
+      // --- スタンプの状態に応じて音を再生 ---
+      const soundFile = item.stamped ? "sounds/001.mp3" : "sounds/002.mp3";
+      const sound = new Audio(soundFile);
+      sound.currentTime = 0;
+      sound.play();
+
       saveData();
       renderCategories();
     };
 
+    
     if ("ontouchend" in window) {
       stamp.addEventListener("touchend", toggle, { passive: false });
     } else {

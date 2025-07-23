@@ -7,7 +7,7 @@ function saveData() {
   localStorage.setItem("items", JSON.stringify(items));
 }
 
-// --- エクスポート機能 ---
+// --- データのエクスポート ---
 document.getElementById("export-btn").addEventListener("click", () => {
   const data = { categories, items };
   const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
@@ -19,7 +19,7 @@ document.getElementById("export-btn").addEventListener("click", () => {
   URL.revokeObjectURL(url);
 });
 
-// --- インポート機能 ---
+// --- データのインポート（修正版） ---
 document.getElementById("import-btn").addEventListener("click", () => {
   document.getElementById("import-file").click();
 });
@@ -33,7 +33,20 @@ document.getElementById("import-file").addEventListener("change", (e) => {
       const data = JSON.parse(reader.result);
       if (data.categories && data.items) {
         categories = data.categories;
-        items = data.items;
+
+        // itemsを安全に復元（空や不正データ対策）
+        items = {};
+        for (const [key, arr] of Object.entries(data.items)) {
+          if (Array.isArray(arr)) {
+            items[key] = arr.map(i => ({
+              name: i.name || "",
+              stamped: !!i.stamped
+            }));
+          } else {
+            items[key] = [];
+          }
+        }
+
         saveData();
         renderCategories();
         alert("データをインポートしました！");
@@ -47,8 +60,7 @@ document.getElementById("import-file").addEventListener("change", (e) => {
   reader.readAsText(file);
 });
 
-// --- 以下は前回と同じ機能 ---
-
+// --- 科目リストを描画 ---
 function renderCategories() {
   const list = document.getElementById("category-list");
   list.innerHTML = "";
@@ -70,6 +82,7 @@ function renderCategories() {
       renderItems();
     });
 
+    // 長押し/右クリックでメニュー表示
     let pressTimer;
     btn.addEventListener("contextmenu", e => {
       e.preventDefault();
@@ -86,6 +99,7 @@ function renderCategories() {
   });
 }
 
+// --- 科目メニュー ---
 function showCategoryMenu(index) {
   const menu = document.getElementById("action-menu");
   menu.classList.remove("hidden");
@@ -116,6 +130,7 @@ function showCategoryMenu(index) {
   };
 }
 
+// --- 項目リストを描画 ---
 function renderItems() {
   const list = document.getElementById("item-list");
   list.innerHTML = "";
@@ -134,7 +149,7 @@ function renderItems() {
       item.stamped = !item.stamped;
       stamp.src = item.stamped ? "icons/img02.svg" : "icons/img01.svg";
 
-      // --- スタンプの状態に応じて音を再生 ---
+      // --- スタンプのON/OFFで音を再生 ---
       const soundFile = item.stamped ? "sounds/001.mp3" : "sounds/002.mp3";
       const sound = new Audio(soundFile);
       sound.currentTime = 0;
@@ -144,7 +159,6 @@ function renderItems() {
       renderCategories();
     };
 
-    
     if ("ontouchend" in window) {
       stamp.addEventListener("touchend", toggle, { passive: false });
     } else {
@@ -168,6 +182,7 @@ function renderItems() {
   });
 }
 
+// --- 項目メニュー ---
 function showItemMenu(index) {
   const menu = document.getElementById("item-action-menu");
   menu.classList.remove("hidden");
@@ -207,6 +222,7 @@ function showItemMenu(index) {
   };
 }
 
+// --- 科目・項目追加 ---
 document.getElementById("add-category").addEventListener("click", () => {
   const name = prompt("新しい科目名を入力してください");
   if (!name) return;
@@ -227,10 +243,12 @@ document.getElementById("add-item").addEventListener("click", () => {
   renderCategories();
 });
 
+// --- 戻るボタン ---
 document.getElementById("back-btn").addEventListener("click", () => {
   document.getElementById("screen2").classList.add("hidden");
   document.getElementById("screen1").classList.remove("hidden");
   currentCategory = null;
 });
 
+// 初期描画
 renderCategories();

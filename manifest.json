@@ -1,10 +1,10 @@
 {
-  "name": "スタンプカード",
-  "short_name": "スタンプカード",
+  "name": "StampCard App",
+  "short_name": "StampCard",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#007BFF",
+  "theme_color": "#4CAF50",
   "icons": [
     {
       "src": "icons/icon-192.png",

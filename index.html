@@ -3,40 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>スタンプカード デモ</title>
-  <link rel="stylesheet" href="./style.css?v=6">
+  <meta name="theme-color" content="#4CAF50">
+  <title>StampCard App</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <!-- 画面1 -->
+  <!-- 画面1: 科目リスト -->
   <div id="screen1">
-    <h2>科目一覧</h2>
+    <h1>科目リスト</h1>
     <div id="category-list"></div>
-    <button id="add-category" class="add-btn">＋</button>
+    <button id="add-category" class="floating-btn">＋</button>
 
-    <!-- データ管理ボタン -->
-    <div id="data-controls">
-      <button id="export-btn">データをエクスポート</button>
-      <button id="import-btn">データをインポート</button>
-      <input type="file" id="import-file" accept="application/json" style="display:none;">
+    <!-- データのエクスポート/インポート -->
+    <div class="export-import">
+      <button id="export-btn">エクスポート</button>
+      <button id="import-btn">インポート</button>
+      <input type="file" id="import-file" accept="application/json" style="display:none">
     </div>
   </div>
 
-  <!-- 画面2 -->
+  <!-- 画面2: 項目リスト -->
   <div id="screen2" class="hidden">
+    <button id="back-btn">← 戻る</button>
     <h2 id="category-title"></h2>
     <ul id="item-list"></ul>
-    <button id="add-item" class="add-btn">＋</button>
-    <button id="back-btn" class="back-btn">← 戻る</button>
+    <button id="add-item" class="floating-btn">＋</button>
   </div>
 
-  <!-- 科目メニュー（画面1用） -->
+  <!-- 科目アクションメニュー -->
   <div id="action-menu" class="hidden">
-    <button id="rename-btn">名前変更</button>
+    <button id="rename-btn">名前を変更</button>
     <button id="delete-btn">削除</button>
     <button id="cancel-btn">キャンセル</button>
   </div>
 
-  <!-- 項目メニュー（画面2用） -->
+  <!-- 項目アクションメニュー -->
   <div id="item-action-menu" class="hidden">
     <button id="move-up-btn">上へ</button>
     <button id="move-down-btn">下へ</button>
@@ -44,6 +46,14 @@
     <button id="cancel-item-btn">キャンセル</button>
   </div>
 
-  <script src="./script.js?v=6"></script>
+  <script src="script.js"></script>
+  <script>
+    // --- Service Worker 登録 ---
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js").then(() => {
+        console.log("Service Worker registered");
+      });
+    }
+  </script>
 </body>
 </html>

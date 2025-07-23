@@ -2,7 +2,6 @@ let categories = JSON.parse(localStorage.getItem("categories")) || [];
 let items = JSON.parse(localStorage.getItem("items")) || {};
 let currentCategory = null;
 
-// データ保存
 function saveData() {
   localStorage.setItem("categories", JSON.stringify(categories));
   localStorage.setItem("items", JSON.stringify(items));
@@ -30,15 +29,15 @@ function renderCategories() {
       renderItems();
     });
 
-    // 長押し・右クリックメニュー（削除/名前変更）
+    // 長押し・右クリックでメニュー
     let pressTimer;
     btn.addEventListener("contextmenu", e => {
       e.preventDefault();
-      showActionMenu(index);
+      showCategoryMenu(index);
     });
     btn.addEventListener("touchstart", () => {
       pressTimer = setTimeout(() => {
-        showActionMenu(index);
+        showCategoryMenu(index);
       }, 600);
     });
     btn.addEventListener("touchend", () => clearTimeout(pressTimer));
@@ -47,27 +46,12 @@ function renderCategories() {
   });
 }
 
-// 科目追加
-document.getElementById("add-category").addEventListener("click", () => {
-  const name = prompt("新しい科目名を入力してください");
-  if (!name) return;
-  const id = Date.now().toString();
-  categories.push({ id, name });
-  items[id] = [];
-  saveData();
-  renderCategories();
-});
-
 // 科目メニュー
-function showActionMenu(index) {
+function showCategoryMenu(index) {
   const menu = document.getElementById("action-menu");
   menu.classList.remove("hidden");
 
-  const renameBtn = document.getElementById("rename-btn");
-  const deleteBtn = document.getElementById("delete-btn");
-  const cancelBtn = document.getElementById("cancel-btn");
-
-  renameBtn.onclick = () => {
+  document.getElementById("rename-btn").onclick = () => {
     const newName = prompt("新しい名前を入力してください", categories[index].name);
     if (newName) {
       categories[index].name = newName;
@@ -77,7 +61,7 @@ function showActionMenu(index) {
     menu.classList.add("hidden");
   };
 
-  deleteBtn.onclick = () => {
+  document.getElementById("delete-btn").onclick = () => {
     const targetId = categories[index].id;
     if (confirm("本当に削除しますか？")) {
       categories.splice(index, 1);
@@ -88,12 +72,12 @@ function showActionMenu(index) {
     menu.classList.add("hidden");
   };
 
-  cancelBtn.onclick = () => {
+  document.getElementById("cancel-btn").onclick = () => {
     menu.classList.add("hidden");
   };
 }
 
-// 項目リスト表示（スタンプ画像化＋タップ安定）
+// 項目リスト表示
 function renderItems() {
   const list = document.getElementById("item-list");
   list.innerHTML = "";
@@ -103,12 +87,10 @@ function renderItems() {
   items[currentCategory].forEach((item, index) => {
     const li = document.createElement("li");
 
-    // スタンプ画像
     const stamp = document.createElement("img");
     stamp.src = item.stamped ? "icons/img02.svg" : "icons/img01.svg";
     stamp.className = "stamp-img";
 
-    // タップ/クリックの安定処理
     const toggle = (e) => {
       e.preventDefault();
       item.stamped = !item.stamped;
@@ -123,40 +105,74 @@ function renderItems() {
       stamp.addEventListener("click", toggle);
     }
 
-    // 項目名
     const span = document.createElement("span");
     span.textContent = item.name;
 
-    // 項目削除（右クリック・長押し）
-    let pressTimer;
-    li.addEventListener("contextmenu", e => {
-      e.preventDefault();
-      if (confirm(`${item.name} を削除しますか？`)) {
-        items[currentCategory].splice(index, 1);
-        saveData();
-        renderItems();
-        renderCategories();
-      }
+    const menuBtn = document.createElement("button");
+    menuBtn.textContent = "⋯";
+    menuBtn.className = "menu-btn";
+    menuBtn.addEventListener("click", () => {
+      showItemMenu(index);
     });
-    li.addEventListener("touchstart", () => {
-      pressTimer = setTimeout(() => {
-        if (confirm(`${item.name} を削除しますか？`)) {
-          items[currentCategory].splice(index, 1);
-          saveData();
-          renderItems();
-          renderCategories();
-        }
-      }, 600);
-    });
-    li.addEventListener("touchend", () => clearTimeout(pressTimer));
 
     li.appendChild(stamp);
     li.appendChild(span);
+    li.appendChild(menuBtn);
     list.appendChild(li);
   });
 }
 
-// 項目追加
+// 項目メニュー
+function showItemMenu(index) {
+  const menu = document.getElementById("item-action-menu");
+  menu.classList.remove("hidden");
+
+  const arr = items[currentCategory];
+
+  document.getElementById("move-up-btn").onclick = () => {
+    if (index > 0) {
+      [arr[index - 1], arr[index]] = [arr[index], arr[index - 1]];
+      saveData();
+      renderItems();
+    }
+    menu.classList.add("hidden");
+  };
+
+  document.getElementById("move-down-btn").onclick = () => {
+    if (index < arr.length - 1) {
+      [arr[index + 1], arr[index]] = [arr[index], arr[index + 1]];
+      saveData();
+      renderItems();
+    }
+    menu.classList.add("hidden");
+  };
+
+  document.getElementById("delete-item-btn").onclick = () => {
+    if (confirm("削除しますか？")) {
+      arr.splice(index, 1);
+      saveData();
+      renderItems();
+      renderCategories();
+    }
+    menu.classList.add("hidden");
+  };
+
+  document.getElementById("cancel-item-btn").onclick = () => {
+    menu.classList.add("hidden");
+  };
+}
+
+// 科目・項目追加イベントは初期化時に一度だけ登録
+document.getElementById("add-category").addEventListener("click", () => {
+  const name = prompt("新しい科目名を入力してください");
+  if (!name) return;
+  const id = Date.now().toString();
+  categories.push({ id, name });
+  items[id] = [];
+  saveData();
+  renderCategories();
+});
+
 document.getElementById("add-item").addEventListener("click", () => {
   const name = prompt("新しい項目名を入力してください");
   if (!name) return;

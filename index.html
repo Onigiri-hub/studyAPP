@@ -3,35 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>学習スタンプアプリ</title>
-  <link rel="stylesheet" href="./style.css?v=3">
+  <title>スタンプカード デモ</title>
+  <link rel="stylesheet" href="./style.css?v=5">
 </head>
 <body>
-  <!-- 画面1（科目一覧） -->
+  <!-- 画面1 -->
   <div id="screen1">
-    <h1>科目一覧</h1>
+    <h2>科目一覧</h2>
     <div id="category-list"></div>
-    <button id="add-category" class="fab">＋</button>
+    <button id="add-category" class="add-btn">＋</button>
   </div>
 
-  <!-- 画面2（項目リスト） -->
+  <!-- 画面2 -->
   <div id="screen2" class="hidden">
-    <h1 id="category-title"></h1>
+    <h2 id="category-title"></h2>
     <ul id="item-list"></ul>
-    <button id="add-item" class="fab">＋</button>
-    <button id="back-btn">戻る</button>
+    <button id="add-item" class="add-btn">＋</button>
+    <button id="back-btn" class="back-btn">← 戻る</button>
   </div>
 
-  <!-- アクションメニュー（名前変更・削除） -->
+  <!-- 科目メニュー（画面1用） -->
   <div id="action-menu" class="hidden">
-    <div class="menu-content">
-      <button id="rename-btn">名前を変更</button>
-      <button id="delete-btn">削除</button>
-      <button id="cancel-btn">キャンセル</button>
-    </div>
+    <button id="rename-btn">名前変更</button>
+    <button id="delete-btn">削除</button>
+    <button id="cancel-btn">キャンセル</button>
   </div>
 
-  <!-- スクリプトは最後に読み込む -->
-  <script src="./script.js?v=3"></script>
+  <!-- 項目メニュー（画面2用） -->
+  <div id="item-action-menu" class="hidden">
+    <button id="move-up-btn">上へ</button>
+    <button id="move-down-btn">下へ</button>
+    <button id="delete-item-btn">削除</button>
+    <button id="cancel-item-btn">キャンセル</button>
+  </div>
+
+  <script src="./script.js?v=5"></script>
 </body>
 </html>

@@ -29,20 +29,9 @@ function renderCategories() {
     btn.className = 'category-btn';
     btn.textContent = `${category.name} (${progress})`;
 
-    // クリックで画面2へ遷移
+    // クリック（PC用）で画面2へ遷移
     btn.addEventListener('click', () => {
-      currentCategory = category;
-      // 画面切り替え
-      document.getElementById('screen1').classList.add('hidden');
-      document.getElementById('screen2').classList.remove('hidden');
-
-      // subject-title を安全に更新
-      const titleEl = document.getElementById('subject-title');
-      if (titleEl) {
-        titleEl.textContent = currentCategory.name;
-      }
-
-      renderItems();
+      openCategory(category);
     });
 
     // 長押し・右クリックでアクションメニュー
@@ -51,19 +40,39 @@ function renderCategories() {
       showCategoryActionMenu(category);
     });
 
-    btn.addEventListener('touchstart', e => {
-      e.preventDefault();
+    // タップ対応
+    let longPressTimeout;
+    let longPressed = false;
+
+    btn.addEventListener('touchstart', () => {
+      longPressed = false;
       longPressTimeout = setTimeout(() => {
+        longPressed = true;
         showCategoryActionMenu(category);
       }, 600);
     });
 
-    btn.addEventListener('touchend', e => {
+    btn.addEventListener('touchend', () => {
       clearTimeout(longPressTimeout);
+      if (!longPressed) {
+        openCategory(category);
+      }
     });
 
     list.appendChild(btn);
   });
+}
+
+// 科目を開く（共通処理）
+function openCategory(category) {
+  currentCategory = category;
+  document.getElementById('screen1').classList.add('hidden');
+  document.getElementById('screen2').classList.remove('hidden');
+  const titleEl = document.getElementById('subject-title');
+  if (titleEl) {
+    titleEl.textContent = currentCategory.name;
+  }
+  renderItems();
 }
 
 // 項目リストを描画
@@ -81,7 +90,7 @@ function renderItems() {
     img.src = item.done ? 'icons/img02.svg' : 'icons/img01.svg';
     img.className = 'stamp-img';
 
-    // スタンプ切り替え（クリック/タップ）
+    // スタンプ切り替え
     const toggleStamp = () => {
       item.done = !item.done;
       img.src = item.done ? 'icons/img02.svg' : 'icons/img01.svg';

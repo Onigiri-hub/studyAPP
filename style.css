@@ -66,13 +66,25 @@ button {
   background: #1976D2;
 }
 
-/* メニューを開くボタン（⋮） */
-.menu-btn, .item-menu-btn {
+/* --- メニュー「・・・」ボタンの調整 --- */
+.menu-btn,
+.item-menu-btn {
+  font-size: 24px;           /* ちょっと大きめに */
+  line-height: 1;
+  padding: 6px 10px;         /* 押しやすく */
+  margin-left: 8px;
+  color: #007BFF;            /* 青系に統一 */
   background: none;
-  font-size: 1.5rem;
-  padding: 0 0.5rem;
-  color: #555;
+  border: none;
+  cursor: pointer;
+  position: relative;
 }
+
+.menu-btn:hover,
+.item-menu-btn:hover {
+  opacity: 0.7;
+}
+
 
 /* 画面下のボタン配置 */
 .bottom-buttons {

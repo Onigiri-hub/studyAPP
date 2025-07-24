@@ -1,253 +1,240 @@
-const STORAGE_KEY = 'study-app-data-v1';
-let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { categories: [] };
-let currentCategory = null;
-let currentItem = null;
+// script.js (v11) - DOMContentLoaded 内で安全に初期化
 
+let categories = JSON.parse(localStorage.getItem("categories")) || [];
+let currentCategoryIndex = null;
+let menuOpen = false;
+
+// データ保存
 function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  localStorage.setItem("categories", JSON.stringify(categories));
 }
 
-// 科目一覧を描画
+// プログレス更新
+function updateProgress() {
+  categories.forEach(cat => {
+    if (!Array.isArray(cat.items)) {
+      cat.items = []; // 古いデータ対策
+    }
+    const done = cat.items.filter(i => i.stamped).length;
+    cat.progress = `${done}/${cat.items.length}`;
+  });
+}
+
+// 画面1描画
 function renderCategories() {
-  const list = document.getElementById('category-list');
-  list.innerHTML = '';
-
-  data.categories.forEach(category => {
-    const total = category.items.length;
-    const done = category.items.filter(item => item.done).length;
-    const progress = `${done}/${total}`;
-
-    const btn = document.createElement('button');
-    btn.className = 'category-btn';
-    btn.textContent = `${category.name} (${progress})`;
-
-    // 通常タップと長押しの判定
-    let longPressTimer;
-    let longPressed = false;
-
-    btn.addEventListener('pointerdown', () => {
-      longPressed = false;
-      longPressTimer = setTimeout(() => {
-        longPressed = true;
-        showCategoryActionMenu(category);
-      }, 600);
+  updateProgress();
+  const container = document.getElementById("category-list");
+  container.innerHTML = "";
+  categories.forEach((cat, index) => {
+    const btn = document.createElement("div");
+    btn.className = "category-item";
+    btn.innerHTML = `
+      <span class="category-name">${cat.name}</span>
+      <span class="category-progress">${cat.progress || "0/0"}</span>
+      <button class="menu-btn" data-index="${index}">⋮</button>
+    `;
+    btn.querySelector(".category-name").addEventListener("pointerup", () => {
+      if (!menuOpen) openCategory(index);
     });
-
-    btn.addEventListener('pointerup', () => {
-      clearTimeout(longPressTimer);
-      if (!longPressed) {
-        openCategory(category);
-      }
+    btn.querySelector(".menu-btn").addEventListener("pointerup", (e) => {
+      e.stopPropagation();
+      showCategoryActionMenu(index, e.target);
     });
-
-    btn.addEventListener('pointerleave', () => {
-      clearTimeout(longPressTimer);
-    });
-
-    list.appendChild(btn);
+    container.appendChild(btn);
   });
 }
 
-function openCategory(category) {
-  currentCategory = category;
-  document.getElementById('screen1').classList.add('hidden');
-  document.getElementById('screen2').classList.remove('hidden');
-  const titleEl = document.getElementById('subject-title');
-  if (titleEl) titleEl.textContent = currentCategory.name;
+// 画面2表示
+function openCategory(index) {
+  currentCategoryIndex = index;
+  const cat = categories[index];
+  document.getElementById("subject-title").textContent = cat.name;
   renderItems();
+  document.getElementById("screen1").classList.add("hidden");
+  document.getElementById("screen2").classList.remove("hidden");
+  history.pushState({ screen: 2 }, "", "");
 }
 
+// 画面2のリスト描画
 function renderItems() {
-  const list = document.getElementById('item-list');
-  list.innerHTML = '';
-  if (!currentCategory) return;
+  const container = document.getElementById("item-list");
+  container.innerHTML = "";
+  const cat = categories[currentCategoryIndex];
+  cat.items.forEach((item, idx) => {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <img class="stamp-icon" src="${item.stamped ? 'icons/img02.svg' : 'icons/img01.svg'}" alt="stamp">
+      <span class="item-text">${item.text}</span>
+      <button class="item-menu-btn" data-idx="${idx}">⋮</button>
+    `;
+    div.querySelector(".stamp-icon").addEventListener("pointerup", () => {
+      item.stamped = !item.stamped;
+      div.querySelector(".stamp-icon").src = item.stamped ? 'icons/img02.svg' : 'icons/img01.svg';
+      playSound(item.stamped ? "001.mp3" : "002.mp3");
+      saveData();
+      updateProgress();
+      renderCategories();
+    });
+    div.querySelector(".item-menu-btn").addEventListener("pointerup", (e) => {
+      e.stopPropagation();
+      showItemActionMenu(idx, e.target);
+    });
+    container.appendChild(div);
+  });
+}
 
-  currentCategory.items.forEach((item, index) => {
-    const li = document.createElement('li');
+// メニュー関連
+function showCategoryActionMenu(index, target) {
+  const menu = document.getElementById("category-action-menu");
+  menu.style.display = "block";
+  menu.style.top = `${target.getBoundingClientRect().bottom + window.scrollY}px`;
+  menu.style.left = `${target.getBoundingClientRect().left}px`;
+  menuOpen = true;
 
-    // スタンプアイコン
-    const img = document.createElement('img');
-    img.src = item.done ? 'icons/img02.svg' : 'icons/img01.svg';
-    img.className = 'stamp-img';
-
-    const toggleStamp = () => {
-      item.done = !item.done;
-      img.src = item.done ? 'icons/img02.svg' : 'icons/img01.svg';
-
-      const sound = new Audio(item.done ? 'sounds/001.mp3' : 'sounds/002.mp3');
-      sound.play();
-
+  menu.querySelector("#rename-category-btn").onclick = () => {
+    const newName = prompt("新しい科目名を入力してください", categories[index].name);
+    if (newName) {
+      categories[index].name = newName;
       saveData();
       renderCategories();
-    };
+    }
+    closeMenus();
+  };
+  menu.querySelector("#delete-category-btn").onclick = () => {
+    if (confirm("削除してもよろしいですか？")) {
+      categories.splice(index, 1);
+      saveData();
+      renderCategories();
+    }
+    closeMenus();
+  };
+  menu.querySelector("#cancel-category-btn").onclick = closeMenus;
+}
 
-    img.addEventListener('pointerup', toggleStamp);
+function showItemActionMenu(idx, target) {
+  const menu = document.getElementById("item-action-menu");
+  menu.style.display = "block";
+  menu.style.top = `${target.getBoundingClientRect().bottom + window.scrollY}px`;
+  menu.style.left = `${target.getBoundingClientRect().left}px`;
+  menuOpen = true;
 
-    const span = document.createElement('span');
-    span.textContent = item.text;
+  const cat = categories[currentCategoryIndex];
+  menu.querySelector("#move-up-btn").onclick = () => {
+    if (idx > 0) {
+      [cat.items[idx - 1], cat.items[idx]] = [cat.items[idx], cat.items[idx - 1]];
+      saveData();
+      renderItems();
+    }
+    closeMenus();
+  };
+  menu.querySelector("#move-down-btn").onclick = () => {
+    if (idx < cat.items.length - 1) {
+      [cat.items[idx + 1], cat.items[idx]] = [cat.items[idx], cat.items[idx + 1]];
+      saveData();
+      renderItems();
+    }
+    closeMenus();
+  };
+  menu.querySelector("#delete-item-btn").onclick = () => {
+    if (confirm("削除してもよろしいですか？")) {
+      cat.items.splice(idx, 1);
+      saveData();
+      renderItems();
+      updateProgress();
+      renderCategories();
+    }
+    closeMenus();
+  };
+  menu.querySelector("#cancel-item-btn").onclick = closeMenus;
+}
 
-    // ⋯メニューボタン
-    const menuBtn = document.createElement('button');
-    menuBtn.className = 'menu-btn';
-    menuBtn.textContent = '⋯';
-    menuBtn.addEventListener('pointerup', () => {
-      currentItem = { item, index };
-      showItemActionMenu();
-    });
+function closeMenus() {
+  document.querySelectorAll(".action-menu").forEach(m => m.style.display = "none");
+  menuOpen = false;
+}
 
-    li.appendChild(img);
-    li.appendChild(span);
-    li.appendChild(menuBtn);
-    list.appendChild(li);
+document.addEventListener("pointerup", (e) => {
+  if (menuOpen && !e.target.closest(".action-menu") && !e.target.closest(".menu-btn") && !e.target.closest(".item-menu-btn")) {
+    closeMenus();
+  }
+});
+
+// サウンド再生
+function playSound(file) {
+  const audio = new Audio(`sounds/${file}`);
+  audio.play();
+}
+
+// DOM読み込み後の初期化
+document.addEventListener("DOMContentLoaded", () => {
+  renderCategories();
+
+  // 戻るボタン
+  document.getElementById("back-btn").addEventListener("pointerup", () => {
+    document.getElementById("screen2").classList.add("hidden");
+    document.getElementById("screen1").classList.remove("hidden");
+    currentCategoryIndex = null;
+    renderCategories();
+    history.back();
   });
 
-  renderCategories();
-}
-
-// 科目追加
-document.getElementById('add-category').addEventListener('pointerup', () => {
-  const name = prompt('科目名を入力してください:');
-  if (!name) return;
-  data.categories.push({ name, items: [] });
-  saveData();
-  renderCategories();
-});
-
-// 項目追加
-document.getElementById('add-item').addEventListener('pointerup', () => {
-  const text = prompt('項目名を入力してください:');
-  if (!text || !currentCategory) return;
-  currentCategory.items.push({ text, done: false });
-  saveData();
-  renderItems();
-});
-
-// 戻るボタン
-document.getElementById('back-btn').addEventListener('pointerup', () => {
-  currentCategory = null;
-  document.getElementById('screen2').classList.add('hidden');
-  document.getElementById('screen1').classList.remove('hidden');
-  renderCategories();
-});
-
-// オーバーレイ処理
-const overlay = document.getElementById('menu-overlay');
-
-function showOverlay() {
-  overlay.classList.remove('hidden');
-}
-
-function hideOverlay() {
-  overlay.classList.add('hidden');
-  document.getElementById('action-menu').classList.add('hidden');
-  document.getElementById('item-action-menu').classList.add('hidden');
-}
-
-// 背景タップで閉じる
-overlay.addEventListener('pointerup', hideOverlay);
-
-// 科目アクションメニュー
-function showCategoryActionMenu(category) {
-  showOverlay();
-  const menu = document.getElementById('action-menu');
-  menu.classList.remove('hidden');
-
-  document.getElementById('rename-category').onclick = () => {
-    const newName = prompt('新しい科目名を入力:');
-    if (newName) {
-      category.name = newName;
+  // 科目追加
+  document.getElementById("add-category-btn").addEventListener("pointerup", () => {
+    const name = prompt("新しい科目名を入力してください");
+    if (name) {
+      categories.push({ name, items: [], progress: "0/0" });
       saveData();
       renderCategories();
     }
-    hideOverlay();
-  };
+  });
 
-  document.getElementById('delete-category').onclick = () => {
-    if (confirm('削除しますか？')) {
-      data.categories = data.categories.filter(c => c !== category);
-      saveData();
-      renderCategories();
-    }
-    hideOverlay();
-  };
-
-  document.getElementById('cancel-action').onclick = () => {
-    hideOverlay();
-  };
-}
-
-// 項目アクションメニュー
-function showItemActionMenu() {
-  showOverlay();
-  const menu = document.getElementById('item-action-menu');
-  menu.classList.remove('hidden');
-
-  const { index } = currentItem;
-
-  document.getElementById('move-up').onclick = () => {
-    if (index > 0) {
-      const arr = currentCategory.items;
-      [arr[index - 1], arr[index]] = [arr[index], arr[index - 1]];
+  // 項目追加
+  document.getElementById("add-item-btn").addEventListener("pointerup", () => {
+    const text = prompt("新しい項目名を入力してください");
+    if (text) {
+      categories[currentCategoryIndex].items.push({ text, stamped: false });
       saveData();
       renderItems();
-    }
-    hideOverlay();
-  };
-
-  document.getElementById('move-down').onclick = () => {
-    const arr = currentCategory.items;
-    if (index < arr.length - 1) {
-      [arr[index + 1], arr[index]] = [arr[index], arr[index + 1]];
-      saveData();
-      renderItems();
-    }
-    hideOverlay();
-  };
-
-  document.getElementById('delete-item').onclick = () => {
-    currentCategory.items.splice(index, 1);
-    saveData();
-    renderItems();
-    hideOverlay();
-  };
-
-  document.getElementById('cancel-item-action').onclick = () => {
-    hideOverlay();
-  };
-}
-
-// データのエクスポート
-document.getElementById('export-btn').addEventListener('pointerup', () => {
-  const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'data.json';
-  a.click();
-  URL.revokeObjectURL(url);
-});
-
-// データのインポート
-document.getElementById('import-btn').addEventListener('pointerup', () => {
-  document.getElementById('import-file').click();
-});
-
-document.getElementById('import-file').addEventListener('change', e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      data = JSON.parse(reader.result);
-      saveData();
+      updateProgress();
       renderCategories();
-      alert('インポートしました');
-    } catch {
-      alert('インポート失敗');
     }
-  };
-  reader.readAsText(file);
-});
+  });
 
-// 初期表示
-renderCategories();
+  // エクスポート
+  document.getElementById("export-btn").addEventListener("pointerup", () => {
+    const blob = new Blob([JSON.stringify(categories)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "data.json";
+    a.click();
+  });
+
+  // インポート
+  document.getElementById("import-btn").addEventListener("pointerup", () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (Array.isArray(data)) {
+            categories = data;
+            saveData();
+            renderCategories();
+          } else {
+            alert("無効なデータです");
+          }
+        } catch {
+          alert("読み込みに失敗しました");
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  });
+});

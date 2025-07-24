@@ -1,205 +1,138 @@
-/* 全体レイアウト */
+/* 共通レイアウト */
 body {
-  font-family: sans-serif;
   margin: 0;
-  padding: 0;
-  background-color: #f0f0f0;
+  font-family: sans-serif;
+  background: #f5f7fa;
   color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-h1, h2 {
-  text-align: center;
-  margin: 20px 0;
-}
-
-/* 画面切り替え */
 .hidden {
   display: none;
 }
 
-/* 科目ボタン（画面1） */
-#category-list {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  margin: 20px;
+/* リスト */
+.list {
+  padding: 1rem;
 }
 
-.category-btn {
-  width: 90%;
-  max-width: 400px;
-  padding: 15px;
-  font-size: 1.5rem;
-  text-align: center;
-  background-color: #ffffff;
-  border: 2px solid #2196F3; /* 青い縁取り */
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: background-color 0.2s;
-}
-
-.category-btn:hover {
-  background-color: #e3f2fd; /* 淡い水色 */
-}
-
-/* 浮遊＋ボタン（画面1と画面2共通） */
-.floating-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: #2196F3; /* 水色 */
-  color: white;
-  font-size: 2rem;
-  width: 60px;
-  height: 60px;
-  border: none;
-  border-radius: 50%;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  transition: transform 0.2s ease;
-}
-
-.floating-btn:hover {
-  transform: scale(1.1);
-}
-
-/* エクスポート・インポートボタン */
-.export-import {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 20px 0;
-}
-
-.export-import button {
-  padding: 10px 20px;
-  font-size: 1rem;
-  border: none;
-  border-radius: 8px;
-  background-color: #2196F3; /* 水色 */
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: background-color 0.2s;
-}
-
-.export-import button:hover {
-  background-color: #1976D2; /* 濃い青 */
-}
-
-/* 画面2のリスト */
-#item-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-#item-list li {
+.category-item, .item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #ffffff;
-  margin: 10px 0;
-  padding: 10px;
+  background: #ffffff;
+  margin-bottom: 0.5rem;
+  padding: 0.75rem;
+  border: 2px solid #2196F3;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-size: 1.2rem;
+  position: relative;
 }
 
-/* スタンプのアイコン */
-.stamp-img {
-  width: 40px;
-  height: 40px;
-  margin-right: 10px;
-  cursor: pointer;
+.category-name, .item-text {
+  flex-grow: 1;
+  margin: 0 0.5rem;
 }
 
-/* 画面2のメニュー（⋯ボタン） */
-.menu-btn {
-  background: none;
+.category-progress {
+  font-size: 0.9rem;
+  margin-left: auto;
+}
+
+/* ボタンスタイル */
+button {
   border: none;
-  font-size: 1.5rem;
   cursor: pointer;
+  font-size: 1rem;
+  background: none;
+}
+
+.circle-btn {
+  background: #2196F3;
+  color: #fff;
+  font-size: 1.8rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: background 0.2s;
+}
+.circle-btn:hover {
+  background: #1976D2;
+}
+
+/* メニューを開くボタン（⋮） */
+.menu-btn, .item-menu-btn {
+  background: none;
+  font-size: 1.5rem;
+  padding: 0 0.5rem;
   color: #555;
 }
 
-/* 画面2 戻るボタン */
-#back-btn {
-  margin: 10px;
-  padding: 10px 15px;
-  font-size: 1.2rem;
-  background-color: #2196F3; /* 水色 */
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: background-color 0.2s;
-}
-
-#back-btn:hover {
-  background-color: #1976D2; /* 濃い青 */
-}
-
-/* アクションメニュー（科目用と項目用） */
-#action-menu, #item-action-menu {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: white;
-  box-shadow: 0 -2px 6px rgba(0,0,0,0.3);
+/* 画面下のボタン配置 */
+.bottom-buttons {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  gap: 10px;
-  z-index: 2000;
-  transition: opacity 0.2s;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1rem 0;
 }
 
-#action-menu.hidden, #item-action-menu.hidden {
-  opacity: 0;
-  pointer-events: none;
+/* セカンダリーボタン */
+.secondary-btn {
+  background: #e0e0e0;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  color: #333;
+  font-size: 1rem;
 }
 
-#action-menu button, #item-action-menu button {
-  width: 80%;
-  max-width: 300px;
-  padding: 10px;
-  font-size: 1.2rem;
-  border: none;
-  border-radius: 8px;
-  background-color: #2196F3; /* 水色 */
-  color: white;
+/* 項目のスタンプ */
+.stamp-icon {
+  width: 32px;
+  height: 32px;
   cursor: pointer;
-  transition: background-color 0.2s;
 }
 
-#action-menu button:hover, #item-action-menu button:hover {
-  background-color: #1976D2; /* 濃い青 */
-}
-
-#menu-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 50;
-}
-
-#menu-overlay.hidden {
+/* アクションメニュー */
+.action-menu {
   display: none;
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+.action-menu button {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  text-align: left;
+  background: none;
+  border: none;
+  font-size: 1rem;
+}
+.action-menu button:hover {
+  background: #f0f0f0;
 }
 
-
-
+/* 画面2のヘッダー */
+header {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  background: #f0f8ff;
+  border-bottom: 2px solid #2196F3;
+}
+header h2 {
+  flex-grow: 1;
+  margin: 0;
+  text-align: center;
+  color: #2196F3;
+  font-size: 1.4rem;
+}

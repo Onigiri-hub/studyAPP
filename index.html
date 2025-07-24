@@ -3,62 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Study App</title>
-
-  <!-- PWA対応 -->
+  <title>Study App</title>
+  <link rel="stylesheet" href="style.css?v=7">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#2196F3">
-
-  <!-- iOS PWA対応 -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#4da3ff">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css?v=4">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').then(() => {
+        console.log('Service Worker registered');
+      });
+    }
+  </script>
 </head>
 <body>
   <!-- 画面1: 科目一覧 -->
-  <div id="screen1">
-    <div id="category-list"></div>
-
-    <!-- エクスポート / インポート -->
-    <div class="export-import">
-      <button id="export-btn">エクスポート</button>
-      <button id="import-btn">インポート</button>
+  <div id="screen1" class="screen">
+    <h1>科目一覧</h1>
+    <div id="category-list" class="list"></div>
+    <div class="bottom-buttons">
+      <button id="export-btn" class="action-btn">エクスポート</button>
+      <button id="import-btn" class="action-btn">インポート</button>
       <input type="file" id="import-file" style="display:none">
+      <button id="add-category" class="floating-btn">＋</button>
     </div>
-
-    <!-- 科目追加ボタン -->
-    <button id="add-category" class="floating-btn">＋</button>
   </div>
 
-  <!-- 画面2: 選択した科目の項目リスト -->
-  <div id="screen2" class="hidden">
-    <button id="back-btn">← 戻る</button>
+  <!-- 画面2: 項目一覧 -->
+  <div id="screen2" class="screen hidden">
     <h2 id="subject-title"></h2>
-    <ul id="item-list"></ul>
-
-    <!-- 項目追加ボタン -->
-    <button id="add-item" class="floating-btn">＋</button>
+    <ul id="item-list" class="list"></ul>
+    <div class="bottom-buttons">
+      <button id="back-btn" class="action-btn">戻る</button>
+      <button id="add-item" class="floating-btn">＋</button>
+    </div>
   </div>
 
-  <!-- 科目用メニュー（削除・名前変更） -->
-  <div id="action-menu" class="hidden">
-    <button id="rename-category">名前を変更</button>
-    <button id="delete-category">削除</button>
-    <button id="cancel-action">キャンセル</button>
+  <!-- オーバーレイ -->
+  <div id="menu-overlay" class="hidden"></div>
+
+  <!-- 科目用メニュー -->
+  <div id="action-menu" class="menu hidden">
+    <button id="rename-category" class="menu-option">名前を変更</button>
+    <button id="delete-category" class="menu-option">削除</button>
+    <button id="cancel-action" class="menu-option">キャンセル</button>
   </div>
 
-  <!-- 項目用メニュー（上へ・下へ・削除） -->
-  <div id="item-action-menu" class="hidden">
-    <button id="move-up">上へ</button>
-    <button id="move-down">下へ</button>
-    <button id="delete-item">削除</button>
-    <button id="cancel-item-action">キャンセル</button>
+  <!-- 項目用メニュー -->
+  <div id="item-action-menu" class="menu hidden">
+    <button id="move-up" class="menu-option">上へ</button>
+    <button id="move-down" class="menu-option">下へ</button>
+    <button id="delete-item" class="menu-option">削除</button>
+    <button id="cancel-item-action" class="menu-option">キャンセル</button>
   </div>
 
-  <!-- スクリプト -->
-  <script src="script.js?v=6" defer></script>
+  <script src="script.js?v=7" defer></script>
 </body>
 </html>

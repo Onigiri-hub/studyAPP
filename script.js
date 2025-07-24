@@ -21,7 +21,7 @@ function renderCategories() {
     btn.className = 'category-btn';
     btn.textContent = `${category.name} (${progress})`;
 
-    // 通常タップ・クリック → 科目を開く
+    // 通常タップと長押しの判定
     let longPressTimer;
     let longPressed = false;
 
@@ -29,14 +29,14 @@ function renderCategories() {
       longPressed = false;
       longPressTimer = setTimeout(() => {
         longPressed = true;
-        showCategoryActionMenu(category);  // 長押しでメニュー
+        showCategoryActionMenu(category);
       }, 600);
     });
 
     btn.addEventListener('pointerup', () => {
       clearTimeout(longPressTimer);
       if (!longPressed) {
-        openCategory(category);  // 通常タップのみ画面2へ
+        openCategory(category);
       }
     });
 
@@ -81,7 +81,6 @@ function renderItems() {
       renderCategories();
     };
 
-    // pointerup で切り替え（スマホでも安定）
     img.addEventListener('pointerup', toggleStamp);
 
     const span = document.createElement('span');
@@ -102,7 +101,7 @@ function renderItems() {
     list.appendChild(li);
   });
 
-  renderCategories(); // 進捗更新
+  renderCategories();
 }
 
 // 科目追加
@@ -131,8 +130,25 @@ document.getElementById('back-btn').addEventListener('pointerup', () => {
   renderCategories();
 });
 
+// オーバーレイ処理
+const overlay = document.getElementById('menu-overlay');
+
+function showOverlay() {
+  overlay.classList.remove('hidden');
+}
+
+function hideOverlay() {
+  overlay.classList.add('hidden');
+  document.getElementById('action-menu').classList.add('hidden');
+  document.getElementById('item-action-menu').classList.add('hidden');
+}
+
+// 背景タップで閉じる
+overlay.addEventListener('pointerup', hideOverlay);
+
 // 科目アクションメニュー
 function showCategoryActionMenu(category) {
+  showOverlay();
   const menu = document.getElementById('action-menu');
   menu.classList.remove('hidden');
 
@@ -143,7 +159,7 @@ function showCategoryActionMenu(category) {
       saveData();
       renderCategories();
     }
-    menu.classList.add('hidden');
+    hideOverlay();
   };
 
   document.getElementById('delete-category').onclick = () => {
@@ -152,16 +168,17 @@ function showCategoryActionMenu(category) {
       saveData();
       renderCategories();
     }
-    menu.classList.add('hidden');
+    hideOverlay();
   };
 
   document.getElementById('cancel-action').onclick = () => {
-    menu.classList.add('hidden');
+    hideOverlay();
   };
 }
 
 // 項目アクションメニュー
 function showItemActionMenu() {
+  showOverlay();
   const menu = document.getElementById('item-action-menu');
   menu.classList.remove('hidden');
 
@@ -174,7 +191,7 @@ function showItemActionMenu() {
       saveData();
       renderItems();
     }
-    menu.classList.add('hidden');
+    hideOverlay();
   };
 
   document.getElementById('move-down').onclick = () => {
@@ -184,18 +201,18 @@ function showItemActionMenu() {
       saveData();
       renderItems();
     }
-    menu.classList.add('hidden');
+    hideOverlay();
   };
 
   document.getElementById('delete-item').onclick = () => {
     currentCategory.items.splice(index, 1);
     saveData();
     renderItems();
-    menu.classList.add('hidden');
+    hideOverlay();
   };
 
   document.getElementById('cancel-item-action').onclick = () => {
-    menu.classList.add('hidden');
+    hideOverlay();
   };
 }
 

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2196F3">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css?v=11">
+  <title>学習管理アプリ</title>
+</head>
+<body>
+  <!-- 画面1：科目一覧 -->
+  <div id="screen1">
+    <div id="category-list" class="list"></div>
+    <div class="bottom-buttons">
+      <button id="export-btn" class="secondary-btn">エクスポート</button>
+      <button id="import-btn" class="secondary-btn">インポート</button>
+      <button id="add-category-btn" class="circle-btn">＋</button>
+    </div>
+  </div>
+
+  <!-- 画面2：項目一覧 -->
+  <div id="screen2" class="hidden">
+    <header>
+      <button id="back-btn" class="circle-btn">←</button>
+      <h2 id="subject-title"></h2>
+    </header>
+    <div id="item-list" class="list"></div>
+    <div class="bottom-buttons">
+      <button id="add-item-btn" class="circle-btn">＋</button>
+    </div>
+  </div>
+
+  <!-- 科目用メニュー -->
+  <div id="category-action-menu" class="action-menu">
+    <button id="rename-category-btn">名前変更</button>
+    <button id="delete-category-btn">削除</button>
+    <button id="cancel-category-btn">キャンセル</button>
+  </div>
+
+  <!-- 項目用メニュー -->
+  <div id="item-action-menu" class="action-menu">
+    <button id="move-up-btn">上へ</button>
+    <button id="move-down-btn">下へ</button>
+    <button id="rename-item-btn">名前変更</button>
+    <button id="delete-item-btn">削除</button>
+    <button id="cancel-item-btn">キャンセル</button>
+  </div>
+
+  <script src="script.js?v=11" defer></script>
+</body>
+</html>

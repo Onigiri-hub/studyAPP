@@ -1,15 +1,8 @@
-// ローカルストレージキー
 const STORAGE_KEY = 'study-app-data-v1';
-
-// アプリデータ
-let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
-  categories: []
-};
-
+let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { categories: [] };
 let currentCategory = null;
 let currentItem = null;
 
-// データ保存
 function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
@@ -20,7 +13,6 @@ function renderCategories() {
   list.innerHTML = '';
 
   data.categories.forEach(category => {
-    // 進捗を計算
     const total = category.items.length;
     const done = category.items.filter(item => item.done).length;
     const progress = `${done}/${total}`;
@@ -29,57 +21,45 @@ function renderCategories() {
     btn.className = 'category-btn';
     btn.textContent = `${category.name} (${progress})`;
 
-    // クリック（PC用）で画面2へ遷移
-    btn.addEventListener('click', () => {
-      openCategory(category);
-    });
-
-    // 長押し・右クリックでアクションメニュー
-    btn.addEventListener('contextmenu', e => {
-      e.preventDefault();
-      showCategoryActionMenu(category);
-    });
-
-    // タップ対応
-    let longPressTimeout;
+    // 通常タップ・クリック → 科目を開く
+    let longPressTimer;
     let longPressed = false;
 
-    btn.addEventListener('touchstart', () => {
+    btn.addEventListener('pointerdown', () => {
       longPressed = false;
-      longPressTimeout = setTimeout(() => {
+      longPressTimer = setTimeout(() => {
         longPressed = true;
-        showCategoryActionMenu(category);
+        showCategoryActionMenu(category);  // 長押しでメニュー
       }, 600);
     });
 
-    btn.addEventListener('touchend', () => {
-      clearTimeout(longPressTimeout);
+    btn.addEventListener('pointerup', () => {
+      clearTimeout(longPressTimer);
       if (!longPressed) {
-        openCategory(category);
+        openCategory(category);  // 通常タップのみ画面2へ
       }
+    });
+
+    btn.addEventListener('pointerleave', () => {
+      clearTimeout(longPressTimer);
     });
 
     list.appendChild(btn);
   });
 }
 
-// 科目を開く（共通処理）
 function openCategory(category) {
   currentCategory = category;
   document.getElementById('screen1').classList.add('hidden');
   document.getElementById('screen2').classList.remove('hidden');
   const titleEl = document.getElementById('subject-title');
-  if (titleEl) {
-    titleEl.textContent = currentCategory.name;
-  }
+  if (titleEl) titleEl.textContent = currentCategory.name;
   renderItems();
 }
 
-// 項目リストを描画
 function renderItems() {
   const list = document.getElementById('item-list');
   list.innerHTML = '';
-
   if (!currentCategory) return;
 
   currentCategory.items.forEach((item, index) => {
@@ -90,12 +70,10 @@ function renderItems() {
     img.src = item.done ? 'icons/img02.svg' : 'icons/img01.svg';
     img.className = 'stamp-img';
 
-    // スタンプ切り替え
     const toggleStamp = () => {
       item.done = !item.done;
       img.src = item.done ? 'icons/img02.svg' : 'icons/img01.svg';
 
-      // 音を鳴らす
       const sound = new Audio(item.done ? 'sounds/001.mp3' : 'sounds/002.mp3');
       sound.play();
 
@@ -103,11 +81,8 @@ function renderItems() {
       renderCategories();
     };
 
-    img.addEventListener('click', toggleStamp);
-    img.addEventListener('touchstart', e => {
-      e.preventDefault();
-      toggleStamp();
-    });
+    // pointerup で切り替え（スマホでも安定）
+    img.addEventListener('pointerup', toggleStamp);
 
     const span = document.createElement('span');
     span.textContent = item.text;
@@ -116,7 +91,7 @@ function renderItems() {
     const menuBtn = document.createElement('button');
     menuBtn.className = 'menu-btn';
     menuBtn.textContent = '⋯';
-    menuBtn.addEventListener('click', () => {
+    menuBtn.addEventListener('pointerup', () => {
       currentItem = { item, index };
       showItemActionMenu();
     });
@@ -127,38 +102,36 @@ function renderItems() {
     list.appendChild(li);
   });
 
-  renderCategories(); // 進捗を更新
+  renderCategories(); // 進捗更新
 }
 
 // 科目追加
-document.getElementById('add-category').addEventListener('click', () => {
+document.getElementById('add-category').addEventListener('pointerup', () => {
   const name = prompt('科目名を入力してください:');
   if (!name) return;
-
   data.categories.push({ name, items: [] });
   saveData();
   renderCategories();
 });
 
 // 項目追加
-document.getElementById('add-item').addEventListener('click', () => {
+document.getElementById('add-item').addEventListener('pointerup', () => {
   const text = prompt('項目名を入力してください:');
   if (!text || !currentCategory) return;
-
   currentCategory.items.push({ text, done: false });
   saveData();
   renderItems();
 });
 
 // 戻るボタン
-document.getElementById('back-btn').addEventListener('click', () => {
+document.getElementById('back-btn').addEventListener('pointerup', () => {
   currentCategory = null;
   document.getElementById('screen2').classList.add('hidden');
   document.getElementById('screen1').classList.remove('hidden');
   renderCategories();
 });
 
-// 科目メニュー表示
+// 科目アクションメニュー
 function showCategoryActionMenu(category) {
   const menu = document.getElementById('action-menu');
   menu.classList.remove('hidden');
@@ -187,12 +160,12 @@ function showCategoryActionMenu(category) {
   };
 }
 
-// 項目メニュー表示（上へ・下へ・削除）
+// 項目アクションメニュー
 function showItemActionMenu() {
   const menu = document.getElementById('item-action-menu');
   menu.classList.remove('hidden');
 
-  const { item, index } = currentItem;
+  const { index } = currentItem;
 
   document.getElementById('move-up').onclick = () => {
     if (index > 0) {
@@ -226,8 +199,8 @@ function showItemActionMenu() {
   };
 }
 
-// エクスポート
-document.getElementById('export-btn').addEventListener('click', () => {
+// データのエクスポート
+document.getElementById('export-btn').addEventListener('pointerup', () => {
   const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -237,8 +210,8 @@ document.getElementById('export-btn').addEventListener('click', () => {
   URL.revokeObjectURL(url);
 });
 
-// インポート
-document.getElementById('import-btn').addEventListener('click', () => {
+// データのインポート
+document.getElementById('import-btn').addEventListener('pointerup', () => {
   document.getElementById('import-file').click();
 });
 

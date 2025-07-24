@@ -1,4 +1,3 @@
-
 // ===== データ保存と読み込み =====
 let categories = JSON.parse(localStorage.getItem('categories') || '[]');
 let currentCategoryId = null;
@@ -205,9 +204,29 @@ function renameItem(index) {
 // ===== メニュー表示 =====
 function showCategoryActionMenu(id, x, y) {
   const menu = document.getElementById('category-action-menu');
-  menu.style.left = `${x}px`;
-  menu.style.top = `${y}px`;
   menu.style.display = 'block';
+
+  // 描画完了後に位置調整する
+  requestAnimationFrame(() => {
+    const menuRect = menu.getBoundingClientRect();
+    const screenW = window.innerWidth;
+    const screenH = window.innerHeight;
+
+    let left = x;
+    let top = y;
+    if (x + menuRect.width > screenW) {
+      left = screenW - menuRect.width - 10;
+    }
+    if (y + menuRect.height > screenH) {
+      top = screenH - menuRect.height - 10;
+    }
+
+    menu.style.left = `${left}px`;
+    menu.style.top = `${top}px`;
+  });
+
+  // --- あとは今まで通り ---
+  
   disableBackgroundInteraction(true);
 
   document.getElementById('rename-category-btn').onclick = () => {
@@ -228,9 +247,27 @@ function showCategoryActionMenu(id, x, y) {
 
 function showItemActionMenu(index, x, y) {
   const menu = document.getElementById('item-action-menu');
-  menu.style.left = `${x}px`;
-  menu.style.top = `${y}px`;
   menu.style.display = 'block';
+
+  // 描画完了を待ってからサイズ取得＆位置調整
+  requestAnimationFrame(() => {
+    const menuRect = menu.getBoundingClientRect();
+    const screenW = window.innerWidth;
+    const screenH = window.innerHeight;
+
+    let left = x;
+    let top = y;
+    if (x + menuRect.width > screenW) {
+      left = screenW - menuRect.width - 10;
+    }
+    if (y + menuRect.height > screenH) {
+      top = screenH - menuRect.height - 10;
+    }
+
+    menu.style.left = `${left}px`;
+    menu.style.top = `${top}px`;
+  });
+
   disableBackgroundInteraction(true);
 
   document.getElementById('move-up-btn').onclick = () => {

@@ -1,3 +1,4 @@
+
 // ===== データ保存と読み込み =====
 let categories = JSON.parse(localStorage.getItem('categories') || '[]');
 let currentCategoryId = null;

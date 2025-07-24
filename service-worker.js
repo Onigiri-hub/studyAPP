@@ -1,3 +1,4 @@
+
 const CACHE_NAME = "stampcard-cache-v1";
 const urlsToCache = [
   "./",

@@ -23,9 +23,51 @@ function renderCategories() {
   updateProgress();
   const list = document.getElementById('category-list');
   list.innerHTML = '';
+
   categories.forEach((cat, index) => {
     const div = document.createElement('div');
     div.className = 'category-item';
+
+    // 進捗計算
+    const completed = cat.items.filter(item => item.stamped).length;
+    const total = cat.items.length;
+    const percent = total === 0 ? 0 : (completed / total) * 100;
+
+    // 進捗円グラフ（SVG）
+    const radius = 14;
+    const circumference = 2 * Math.PI * radius;
+    const hue = 80 + (210 - 80) * (percent / 100); // 黄緑→青
+    const circleWrapper = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    circleWrapper.setAttribute('class', 'progress-circle');
+    circleWrapper.setAttribute('viewBox', '0 0 40 40');
+
+    const bgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    bgCircle.setAttribute('cx', '20');
+    bgCircle.setAttribute('cy', '20');
+    bgCircle.setAttribute('r', radius);
+    bgCircle.setAttribute('stroke', '#eee');
+    bgCircle.setAttribute('stroke-width', '4');
+    bgCircle.setAttribute('fill', 'none');
+
+    const fgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    fgCircle.setAttribute('cx', '20');
+    fgCircle.setAttribute('cy', '20');
+    fgCircle.setAttribute('r', radius);
+    fgCircle.setAttribute('stroke', `hsl(${hue}, 80%, 50%)`);
+    fgCircle.setAttribute('stroke-width', '4');
+    fgCircle.setAttribute('fill', 'none');
+    fgCircle.setAttribute('stroke-dasharray', circumference);
+    fgCircle.setAttribute('stroke-dashoffset', circumference);
+    fgCircle.style.transition = 'stroke-dashoffset 0.5s ease, stroke 0.5s ease';
+
+    circleWrapper.appendChild(bgCircle);
+    circleWrapper.appendChild(fgCircle);
+
+    // アニメーションで進捗を反映
+    requestAnimationFrame(() => {
+      fgCircle.setAttribute('stroke-dashoffset', circumference * (1 - percent / 100));
+    });
+
 
     const name = document.createElement('span');
     name.textContent = cat.name;
@@ -43,10 +85,12 @@ function renderCategories() {
       showCategoryActionMenu(cat.id, index, e.clientX, e.clientY);
     });
 
+    div.appendChild(circleWrapper); // 左側に円グラフ
     div.appendChild(name);
     div.appendChild(progress);
     div.appendChild(menuBtn);
-
+    
+    
     // メニュー以外をタップしたときのみ画面2に遷移
     div.addEventListener('pointerup', (e) => {
       if (e.target.classList.contains('menu-btn')) return;

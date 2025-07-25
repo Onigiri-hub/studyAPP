@@ -153,3 +153,36 @@ header h2 {
   color: #2196F3;
   font-size: 1.4rem;
 }
+
+/* 進捗バー(今は使っていないけど） */
+.progress-bar {
+  flex: 0 0 50px;          /* 固定幅（50px） */
+  height: 6px;
+  background: #eee;
+  border-radius: 3px;
+  margin-right: 10px;
+  overflow: hidden;
+  align-self: center;
+  pointer-events: none;    /* バー自体はクリック無効 */
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0;
+  transition: width 0.4s ease, background-color 0.4s ease;
+  border-radius: 3px;
+}
+
+/* 円グラフ（進捗） */
+.progress-circle {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.progress-circle circle {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+

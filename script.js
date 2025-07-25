@@ -82,7 +82,7 @@ function renderCategories() {
     menuBtn.className = 'menu-btn';
     menuBtn.addEventListener('click', (e) => {
       e.stopPropagation(); // バブリングを防ぐ
-      showCategoryActionMenu(cat.id, index, e.clientX, e.clientY);
+      showCategoryActionMenu(cat.id, index);
     });
 
     div.appendChild(circleWrapper); // 左側に円グラフ
@@ -132,7 +132,7 @@ function renderItems() {
     menuBtn.className = 'item-menu-btn';
     menuBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      showItemActionMenu(index, e.clientX, e.clientY);
+      showItemActionMenu(index);
     });
 
     div.appendChild(stamp);
@@ -179,14 +179,14 @@ function deleteCategory(id) {
 }
 
 function renameCategory(id) {
-  const newName = prompt('新しい科目名を入力してください');
+  const cat = categories.find(c => c.id === id);
+  if (!cat) return;
+
+  const newName = prompt('新しい科目名を入力してください', cat.name);
   if (newName) {
-    const cat = categories.find(c => c.id === id);
-    if (cat) {
-      cat.name = newName;
-      saveData();
-      renderCategories();
-    }
+    cat.name = newName;
+    saveData();
+    renderCategories();
   }
 }
 
@@ -261,92 +261,76 @@ function renameItem(index) {
   }
 }
 
-// ===== 共通：メニューを閉じる関数 =====
-function closeActionMenu() {
-  const categoryMenu = document.getElementById('category-action-menu');
-  const itemMenu = document.getElementById('item-action-menu');
-  categoryMenu.style.display = 'none';
-  itemMenu.style.display = 'none';
-  disableBackgroundInteraction(false);
-}
 
 // ===== メニュー表示 =====
-function showCategoryActionMenu(id, index, x, y) {
+function showCategoryActionMenu(id, index) {
   const menu = document.getElementById('category-action-menu');
-  menu.style.display = 'block';
-
-  // 描画完了後に位置調整
-  requestAnimationFrame(() => {
-    const menuRect = menu.getBoundingClientRect();
-    const screenW = window.innerWidth;
-    const screenH = window.innerHeight;
-    let left = x, top = y;
-    if (x + menuRect.width > screenW) left = screenW - menuRect.width - 10;
-    if (y + menuRect.height > screenH) top = screenH - menuRect.height - 10;
-    menu.style.left = `${left}px`;
-    menu.style.top = `${top}px`;
-  });
-
+  menu.classList.add('show'); // 下から表示
   disableBackgroundInteraction(true);
 
   document.getElementById('move-category-up-btn').onclick = () => {
     moveCategoryUp(index);
-    closeActionMenu();
+    closeMenus();
   };
   document.getElementById('move-category-down-btn').onclick = () => {
     moveCategoryDown(index);
-    closeActionMenu();
+    closeMenus();
   };
   document.getElementById('rename-category-btn').onclick = () => {
     renameCategory(id);
-    closeActionMenu();
+    closeMenus();
   };
   document.getElementById('delete-category-btn').onclick = () => {
     deleteCategory(id);
-    closeActionMenu();
+    closeMenus();
   };
   document.getElementById('cancel-category-btn').onclick = () => {
-    closeActionMenu();
+    closeMenus();
   };
 }
 
-function showItemActionMenu(index, x, y) {
+function showItemActionMenu(index) {
   const menu = document.getElementById('item-action-menu');
-  menu.style.display = 'block';
-
-  requestAnimationFrame(() => {
-    const menuRect = menu.getBoundingClientRect();
-    const screenW = window.innerWidth;
-    const screenH = window.innerHeight;
-    let left = x, top = y;
-    if (x + menuRect.width > screenW) left = screenW - menuRect.width - 10;
-    if (y + menuRect.height > screenH) top = screenH - menuRect.height - 10;
-    menu.style.left = `${left}px`;
-    menu.style.top = `${top}px`;
-  });
-
+  menu.classList.add('show'); // 下から表示
   disableBackgroundInteraction(true);
 
   document.getElementById('move-up-btn').onclick = () => {
     moveItemUp(index);
-    closeActionMenu();
+    closeMenus();
   };
   document.getElementById('move-down-btn').onclick = () => {
     moveItemDown(index);
-    closeActionMenu();
+    closeMenus();
   };
   document.getElementById('rename-item-btn').onclick = () => {
     renameItem(index);
-    closeActionMenu();
+    closeMenus();
   };
   document.getElementById('delete-item-btn').onclick = () => {
     deleteItem(index);
-    closeActionMenu();
+    closeMenus();
   };
   document.getElementById('cancel-item-btn').onclick = () => {
-    closeActionMenu();
+    closeMenus();
   };
 }
+
+// メニューを閉じる
+function closeMenus() {
+  document.querySelectorAll('.action-menu').forEach(menu => {
+    menu.classList.remove('show');
+  });
+  disableBackgroundInteraction(false);
+}
+
+// メニュー外クリックで閉じる
+document.addEventListener('pointerdown', (e) => {
+  const menus = document.querySelectorAll('.action-menu');
+  if (![...menus].some(menu => menu.contains(e.target))) {
+    closeMenus();
+  }
+});
+
 
 // メニューが開いている間の背景操作無効化
 function disableBackgroundInteraction(disable) {
@@ -399,12 +383,12 @@ document.getElementById('import-btn').addEventListener('click', importData);
 
 // メニュー外クリックで閉じる
 document.addEventListener('pointerdown', (e) => {
-  const categoryMenu = document.getElementById('category-action-menu');
-  const itemMenu = document.getElementById('item-action-menu');
-  if (!categoryMenu.contains(e.target) && !itemMenu.contains(e.target)) {
-    closeActionMenu();
+  const menus = document.querySelectorAll('.action-menu');
+  if (![...menus].some(menu => menu.contains(e.target))) {
+    closeMenus(); // 新しい関数
   }
 });
+
 
 loadData();
 renderCategories();

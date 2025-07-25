@@ -23,7 +23,7 @@ function renderCategories() {
   updateProgress();
   const list = document.getElementById('category-list');
   list.innerHTML = '';
-  categories.forEach(cat => {
+  categories.forEach((cat, index) => {
     const div = document.createElement('div');
     div.className = 'category-item';
 
@@ -40,7 +40,7 @@ function renderCategories() {
     menuBtn.className = 'menu-btn';
     menuBtn.addEventListener('click', (e) => {
       e.stopPropagation(); // バブリングを防ぐ
-      showCategoryActionMenu(cat.id, e.clientX, e.clientY);
+      showCategoryActionMenu(cat.id, index, e.clientX, e.clientY);
     });
 
     div.appendChild(name);
@@ -105,6 +105,22 @@ function addCategory() {
   if (name) {
     const newCategory = { id: Date.now(), name, items: [], progress: '0/0' };
     categories.push(newCategory);
+    saveData();
+    renderCategories();
+  }
+}
+
+function moveCategoryUp(index) {
+  if (index > 0) {
+    [categories[index - 1], categories[index]] = [categories[index], categories[index - 1]];
+    saveData();
+    renderCategories();
+  }
+}
+
+function moveCategoryDown(index) {
+  if (index < categories.length - 1) {
+    [categories[index + 1], categories[index]] = [categories[index], categories[index + 1]];
     saveData();
     renderCategories();
   }
@@ -201,47 +217,52 @@ function renameItem(index) {
   }
 }
 
+// ===== 共通：メニューを閉じる関数 =====
+function closeActionMenu() {
+  const categoryMenu = document.getElementById('category-action-menu');
+  const itemMenu = document.getElementById('item-action-menu');
+  categoryMenu.style.display = 'none';
+  itemMenu.style.display = 'none';
+  disableBackgroundInteraction(false);
+}
+
 // ===== メニュー表示 =====
-function showCategoryActionMenu(id, x, y) {
+function showCategoryActionMenu(id, index, x, y) {
   const menu = document.getElementById('category-action-menu');
   menu.style.display = 'block';
 
-  // 描画完了後に位置調整する
+  // 描画完了後に位置調整
   requestAnimationFrame(() => {
     const menuRect = menu.getBoundingClientRect();
     const screenW = window.innerWidth;
     const screenH = window.innerHeight;
-
-    let left = x;
-    let top = y;
-    if (x + menuRect.width > screenW) {
-      left = screenW - menuRect.width - 10;
-    }
-    if (y + menuRect.height > screenH) {
-      top = screenH - menuRect.height - 10;
-    }
-
+    let left = x, top = y;
+    if (x + menuRect.width > screenW) left = screenW - menuRect.width - 10;
+    if (y + menuRect.height > screenH) top = screenH - menuRect.height - 10;
     menu.style.left = `${left}px`;
     menu.style.top = `${top}px`;
   });
 
-  // --- あとは今まで通り ---
-  
   disableBackgroundInteraction(true);
 
+  document.getElementById('move-category-up-btn').onclick = () => {
+    moveCategoryUp(index);
+    closeActionMenu();
+  };
+  document.getElementById('move-category-down-btn').onclick = () => {
+    moveCategoryDown(index);
+    closeActionMenu();
+  };
   document.getElementById('rename-category-btn').onclick = () => {
     renameCategory(id);
-    menu.style.display = 'none';
-    disableBackgroundInteraction(false);
+    closeActionMenu();
   };
   document.getElementById('delete-category-btn').onclick = () => {
     deleteCategory(id);
-    menu.style.display = 'none';
-    disableBackgroundInteraction(false);
+    closeActionMenu();
   };
   document.getElementById('cancel-category-btn').onclick = () => {
-    menu.style.display = 'none';
-    disableBackgroundInteraction(false);
+    closeActionMenu();
   };
 }
 
@@ -249,21 +270,13 @@ function showItemActionMenu(index, x, y) {
   const menu = document.getElementById('item-action-menu');
   menu.style.display = 'block';
 
-  // 描画完了を待ってからサイズ取得＆位置調整
   requestAnimationFrame(() => {
     const menuRect = menu.getBoundingClientRect();
     const screenW = window.innerWidth;
     const screenH = window.innerHeight;
-
-    let left = x;
-    let top = y;
-    if (x + menuRect.width > screenW) {
-      left = screenW - menuRect.width - 10;
-    }
-    if (y + menuRect.height > screenH) {
-      top = screenH - menuRect.height - 10;
-    }
-
+    let left = x, top = y;
+    if (x + menuRect.width > screenW) left = screenW - menuRect.width - 10;
+    if (y + menuRect.height > screenH) top = screenH - menuRect.height - 10;
     menu.style.left = `${left}px`;
     menu.style.top = `${top}px`;
   });
@@ -272,27 +285,22 @@ function showItemActionMenu(index, x, y) {
 
   document.getElementById('move-up-btn').onclick = () => {
     moveItemUp(index);
-    menu.style.display = 'none';
-    disableBackgroundInteraction(false);
+    closeActionMenu();
   };
   document.getElementById('move-down-btn').onclick = () => {
     moveItemDown(index);
-    menu.style.display = 'none';
-    disableBackgroundInteraction(false);
+    closeActionMenu();
   };
   document.getElementById('rename-item-btn').onclick = () => {
     renameItem(index);
-    menu.style.display = 'none';
-    disableBackgroundInteraction(false);
+    closeActionMenu();
   };
   document.getElementById('delete-item-btn').onclick = () => {
     deleteItem(index);
-    menu.style.display = 'none';
-    disableBackgroundInteraction(false);
+    closeActionMenu();
   };
   document.getElementById('cancel-item-btn').onclick = () => {
-    menu.style.display = 'none';
-    disableBackgroundInteraction(false);
+    closeActionMenu();
   };
 }
 
@@ -350,9 +358,7 @@ document.addEventListener('pointerdown', (e) => {
   const categoryMenu = document.getElementById('category-action-menu');
   const itemMenu = document.getElementById('item-action-menu');
   if (!categoryMenu.contains(e.target) && !itemMenu.contains(e.target)) {
-    categoryMenu.style.display = 'none';
-    itemMenu.style.display = 'none';
-    disableBackgroundInteraction(false);
+    closeActionMenu();
   }
 });
 

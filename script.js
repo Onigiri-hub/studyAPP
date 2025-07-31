@@ -438,13 +438,13 @@ function importFromCSV() {
 
 
 // ===== イベント登録 =====
-document.getElementById('add-category-btn').addEventListener('click', addCategory);
-document.getElementById('add-item-btn').addEventListener('click', addItem);
-document.getElementById('back-btn').addEventListener('click', goBack);
-document.getElementById('export-btn').addEventListener('click', exportData);
-document.getElementById('import-btn').addEventListener('click', importData);
-document.getElementById('csv-export-btn').addEventListener('click', exportToCSV);
-document.getElementById('csv-import-btn').addEventListener('click', importFromCSV);
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('add-category-btn').addEventListener('click', addCategory);
+  document.getElementById('add-item-btn').addEventListener('click', addItem);
+  document.getElementById('back-btn').addEventListener('click', goBack);
+  document.getElementById('csv-export-btn').addEventListener('click', exportToCSV);
+  document.getElementById('csv-import-btn').addEventListener('click', importFromCSV);
+});
 
 
 // メニュー外クリックで閉じる

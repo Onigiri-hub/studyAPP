@@ -374,12 +374,78 @@ function importData() {
   input.click();
 }
 
+
+function exportToCSV() {
+  let csv = 'カテゴリ名,項目名,スタンプ\n';
+  categories.forEach(cat => {
+    cat.items.forEach(item => {
+      const line = [
+        `"${cat.name}"`,
+        `"${item.text}"`,
+        item.stamped ? '1' : '0'
+      ].join(',');
+      csv += line + '\n';
+    });
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'list.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importFromCSV() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.csv';
+  input.addEventListener('change', () => {
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      const lines = reader.result.trim().split('\n').slice(1); // ヘッダ除去
+      const newCategories = {};
+
+      lines.forEach(line => {
+        const [rawCat, rawText, stamped] = line.split(',');
+        const catName = rawCat.replace(/^"|"$/g, '');
+        const itemText = rawText.replace(/^"|"$/g, '');
+
+        if (!newCategories[catName]) {
+          newCategories[catName] = [];
+        }
+        newCategories[catName].push({
+          text: itemText,
+          stamped: Boolean(Number(stamped))
+        });
+      });
+
+      categories = Object.entries(newCategories).map(([name, items]) => ({
+        id: Date.now() + Math.random(),
+        name,
+        items
+      }));
+
+      saveData();
+      renderCategories();
+    };
+    reader.readAsText(file);
+  });
+  input.click();
+}
+
+
 // ===== イベント登録 =====
 document.getElementById('add-category-btn').addEventListener('click', addCategory);
 document.getElementById('add-item-btn').addEventListener('click', addItem);
 document.getElementById('back-btn').addEventListener('click', goBack);
 document.getElementById('export-btn').addEventListener('click', exportData);
 document.getElementById('import-btn').addEventListener('click', importData);
+document.getElementById('csv-export-btn').addEventListener('click', exportToCSV);
+document.getElementById('csv-import-btn').addEventListener('click', importFromCSV);
+
 
 // メニュー外クリックで閉じる
 document.addEventListener('pointerdown', (e) => {

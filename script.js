@@ -405,7 +405,7 @@ function importFromCSV() {
     const file = input.files[0];
     const reader = new FileReader();
     reader.onload = () => {
-      const lines = reader.result.trim().split('\n').slice(1); // ヘッダ除去
+      const lines = reader.result.trim().split(/\r?\n/).slice(1); // ヘッダ除去
       const newCategories = {};
 
       lines.forEach(line => {
@@ -431,7 +431,7 @@ function importFromCSV() {
       saveData();
       renderCategories();
     };
-    reader.readAsText(file);
+    reader.readAsText(file, 'utf-8');
   });
   input.click();
 }

@@ -51,7 +51,7 @@ button {
 }
 
 .circle-btn {
-  background: #191970;
+  background: #2196F3;
   color: #fff;
   font-size: 1.8rem;
   width: 60px;
@@ -63,6 +63,15 @@ button {
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   transition: background 0.2s;
 }
+
+/* ＋ボタンだけ右下固定 */
+#add-category-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+}
+
 .circle-btn:hover {
   background: #1976D2;
 }
@@ -86,6 +95,19 @@ button {
   opacity: 0.7;
 }
 
+.top-button {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.bottom-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
 
 /* 画面下のボタン配置 */
 .bottom-buttons {

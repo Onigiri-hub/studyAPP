@@ -348,14 +348,16 @@ function playSound(src) {
 
 // ===== インポート／エクスポート =====
 function exportData() {
-  const blob = new Blob([JSON.stringify(categories)], { type: 'application/json' });
+  const json = JSON.stringify(categories, null, 2); // 整形して保存
+  const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
   a.download = 'data.json';
   a.click();
-  URL.revokeObjectURL(url);
+  URL.revokeObjectURL(url); // ✅ 忘れずに開放（あなたのコードにもあるのでOK）
 }
+
 
 function importData() {
   const input = document.createElement('input');
@@ -363,16 +365,29 @@ function importData() {
   input.accept = 'application/json';
   input.addEventListener('change', () => {
     const file = input.files[0];
+    if (!file) return;
+
     const reader = new FileReader();
     reader.onload = () => {
-      categories = JSON.parse(reader.result);
-      saveData();
-      renderCategories();
+      try {
+        const data = JSON.parse(reader.result);
+        if (Array.isArray(data)) {
+          categories = data;
+          saveData();
+          renderCategories();
+        } else {
+          alert('無効なデータ形式です。');
+        }
+      } catch (e) {
+        alert('読み込み中にエラーが発生しました。');
+        console.error(e);
+      }
     };
     reader.readAsText(file);
   });
   input.click();
 }
+
 
 
 function exportToCSV() {
@@ -445,6 +460,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('back-btn').addEventListener('click', goBack);
   document.getElementById('csv-export-btn').addEventListener('click', exportToCSV);
   document.getElementById('csv-import-btn').addEventListener('click', importFromCSV);
+  document.getElementById('export-btn').addEventListener('click', exportData);
+  document.getElementById('import-btn').addEventListener('click', importData);
 });
 
 

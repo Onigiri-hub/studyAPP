@@ -438,19 +438,13 @@ function importFromCSV() {
 
 
 // ===== イベント登録 =====
+
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('add-category-btn').addEventListener('click', addCategory);
   document.getElementById('add-item-btn').addEventListener('click', addItem);
   document.getElementById('back-btn').addEventListener('click', goBack);
   document.getElementById('csv-export-btn').addEventListener('click', exportToCSV);
-
-  // 変更点①：ボタンクリックで file input を開く
-  document.getElementById('csv-import-btn').addEventListener('click', () => {
-    document.getElementById('hidden-file-input').click();
-  });
-
-  // 変更点②：ファイルが選ばれたら読み込み処理を実行
-  document.getElementById('hidden-file-input').addEventListener('change', importFromCSV);
+  document.getElementById('csv-import-btn').addEventListener('click', importFromCSV);
 });
 
 

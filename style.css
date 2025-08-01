@@ -76,6 +76,34 @@ button {
   background: #1976D2;
 }
 
+/* 画面2の＋ボタンだけ色を変える */
+.circle-btn.screen2-btn {
+  background: #000080;
+  color: #fff;
+  font-size: 1.8rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: background 0.2s;
+}
+
+.circle-btn.screen2-btn:hover {
+  background: #000060; /* 任意でホバー色 */
+}
+
+#add-item-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+}
+
+
+
 /* --- メニュー「・・・」ボタンの調整 --- */
 .menu-btn,
 .item-menu-btn {
@@ -223,6 +251,12 @@ header h2 {
 .progress-circle circle {
   transform: rotate(-90deg);
   transform-origin: 50% 50%;
+}
+
+.list::after {
+  content: '';
+  display: block;
+  height: 80px; /* ＋ボタンの大きさより少し大きめに */
 }
 
 
